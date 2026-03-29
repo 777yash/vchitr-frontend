@@ -62,6 +62,9 @@ export const PanelLeftCloseIcon = (props: IconProps = {}) =>
 export const PanelLeftOpenIcon = (props: IconProps = {}) =>
   svgBase(props, <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /><path d="m14 9 3 3-3 3" /></>);
 
+export const MenuIcon = (props: IconProps = {}) =>
+  svgBase(props, <><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></>);
+
 export const PencilIcon = (props: IconProps = {}) =>
   svgBase({ ...props, size: props.size || 14 }, <><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></>);
 

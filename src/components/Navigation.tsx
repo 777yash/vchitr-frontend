@@ -5,7 +5,8 @@ import './Navigation.css';
 const Navigation: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [posX, setPosX] = useState(32); // 32px ~ 2rem default
+  // Set default starting pos to match visual layout next to "vCHITR" brand (~120px)
+  const [posX, setPosX] = useState(120);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startPosX = useRef(0);
@@ -23,6 +24,12 @@ const Navigation: React.FC = () => {
       setIsDark(false);
       document.documentElement.setAttribute('data-theme', 'light');
     }
+  }, []);
+
+  useEffect(() => {
+    const handleToggle = () => setIsOpen(true);
+    window.addEventListener('toggle-main-nav', handleToggle);
+    return () => window.removeEventListener('toggle-main-nav', handleToggle);
   }, []);
 
   const toggleTheme = () => {
