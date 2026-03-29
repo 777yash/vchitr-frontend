@@ -34,9 +34,8 @@
 .navbar-trigger {
   position: absolute;
   top: 0;
-  left: 2rem;
   width: 50px;
-  height: 40px;
+  height: 44px;
   background-color: var(--nav-bg, rgba(255, 255, 255, 0.9));
   color: var(--text-color, #000);
   display: flex;
@@ -46,12 +45,18 @@
   border-bottom-right-radius: 8px;
   border: 1px solid var(--nav-border, rgba(0, 0, 0, 0.1));
   border-top: none;
-  cursor: pointer;
+  cursor: grab;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   font-size: 1.2rem;
   z-index: 999;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
   pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.navbar-trigger:active {
+  cursor: grabbing;
 }
 
 /* Hide the trigger button when the navbar is open */

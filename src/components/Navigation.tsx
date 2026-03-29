@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Navigation.css';
 
 const Navigation: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [posX, setPosX] = useState(32); // 32px ~ 2rem default
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startPosX = useRef(0);
+  const dragged = useRef(false);
 
   useEffect(() => {
     // Check initial preference
@@ -31,10 +36,53 @@ const Navigation: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDragging.current = true;
+    dragged.current = false;
+    startX.current = e.clientX;
+    startPosX.current = posX;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 3) dragged.current = true;
+    
+    let newX = startPosX.current + dx;
+    // Bound to screen (button is ~50px wide)
+    newX = Math.max(0, Math.min(newX, window.innerWidth - 50));
+    setPosX(newX);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (dragged.current) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    toggleNav();
+  };
+
   return (
     <div className={`navigation-wrapper ${isOpen ? 'open' : ''}`}>
       {/* The visible trigger button to open */}
-      <button className="navbar-trigger" onClick={toggleNav} aria-label="Open Navigation">
+      <button 
+        className="navbar-trigger" 
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={{ left: `${posX}px`, touchAction: 'none' }}
+        aria-label="Open Navigation"
+      >
         ☰
       </button>
       

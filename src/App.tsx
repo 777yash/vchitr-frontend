@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Subjects from './pages/Subjects'
 import Faq from './pages/Faq'
 import Contact from './pages/Contact'
+import Notes from './pages/Notes'
 
 function App() {
   return (
@@ -14,8 +15,8 @@ function App() {
         <Route path="/subjects" element={<Subjects />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/contact" element={<Contact />} />
-        {/* Fallback routes for now */}
-        <Route path="/notes" element={<div style={{ padding: '5rem 2rem' }}>Notes page coming soon...</div>} />
+        <Route path="/notes" element={<Notes />} />
+        <Route path="/notes/:subjectName" element={<Notes />} />
       </Routes>
     </div>
   )

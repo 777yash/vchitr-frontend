@@ -1,5 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 :root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --ui-font: 'IBM Plex Sans', system-ui, sans-serif;
+  --ui-serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+  --ui-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  font-family: var(--ui-font);
   line-height: 1.5;
   font-weight: 400;
 
@@ -22,7 +28,7 @@
 [data-theme='dark'] {
   --bg-color: #121212;
   --text-color: #ffffff;
-  --card-bg: rgba(30, 30, 30, 0.90);
+  --card-bg: rgba(30, 30, 30, 0.9);
   --border-color: #444444;
   --card-text: #ffffff;
   --input-border: #555555;
@@ -31,8 +37,17 @@
   --btn-hover: #e0e0e0;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -42,10 +57,18 @@ body {
   min-height: 100vh;
   background-color: var(--bg-color);
   color: var(--text-color);
+  font-family: var(--ui-font);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  font-family: inherit;
+}
+
 #root {
-  width: 100%;
   min-height: 100vh;
 }

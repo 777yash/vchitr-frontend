@@ -33,6 +33,7 @@ const Subjects: React.FC = () => {
             key={index}
             className="subject-card"
             style={{ backgroundImage: sub.bgImage }}
+            onClick={() => navigate(`/notes/${encodeURIComponent(sub.name)}`)}
           >
             <div className="subject-card-overlay">
               <h2>{sub.name}</h2>
