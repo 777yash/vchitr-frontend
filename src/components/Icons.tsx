@@ -138,3 +138,9 @@ export const ALargeSmallIcon = (props: IconProps = {}) =>
 // Context menu icons
 export const FilePlus2Icon = (props: IconProps = {}) =>
   svgBase(props, <><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M3 15h6" /><path d="M6 12v6" /></>);
+
+export const XIcon = (props: IconProps = {}) =>
+  svgBase(props, <><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>);
+
+export const CircleDotIcon = (props: IconProps = {}) =>
+  svgBase(props, <><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" /></>);

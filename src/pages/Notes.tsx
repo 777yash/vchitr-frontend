@@ -5,7 +5,7 @@ import {
   FolderIcon, FolderOpenIcon, FileTextIcon, SearchIcon,
   FilePlusIcon, FolderPlusIcon, ChevronRightIcon,
   PanelLeftCloseIcon, PanelLeftOpenIcon, PencilIcon, TrashIcon,
-  FilePlus2Icon,
+  FilePlus2Icon, XIcon, CircleDotIcon,
 } from '../components/Icons';
 import './Notes.css';
 
@@ -295,7 +295,11 @@ const Notes: React.FC = () => {
     return initial;
   });
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+  const [openTabs, setOpenTabs] = useState<string[]>([]);
   const [noteContents, setNoteContents] = useState<Record<string, string>>({});
+  const [savedContents, setSavedContents] = useState<Record<string, string>>({});
+  const [dragTabId, setDragTabId] = useState<string | null>(null);
+  const [dragOverTabId, setDragOverTabId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -331,9 +335,59 @@ const Notes: React.FC = () => {
 
   const selectNote = useCallback((item: NoteItem) => {
     setActiveNoteId(item.id);
-    // On mobile, close sidebar when selecting a note
+    setOpenTabs((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]));
+    setSavedContents((prev) =>
+      item.id in prev ? prev : { ...prev, [item.id]: '' }
+    );
     setMobileOpen(false);
   }, []);
+
+  const closeTab = useCallback((id: string) => {
+    setOpenTabs((prev) => {
+      const idx = prev.indexOf(id);
+      if (idx === -1) return prev;
+      const next = prev.filter((t) => t !== id);
+      setActiveNoteId((curActive) => {
+        if (curActive !== id) return curActive;
+        if (next.length === 0) return null;
+        return next[Math.min(idx, next.length - 1)];
+      });
+      return next;
+    });
+  }, []);
+
+  const reorderTabs = useCallback((fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    setOpenTabs((prev) => {
+      const fromIdx = prev.indexOf(fromId);
+      const toIdx = prev.indexOf(toId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const next = [...prev];
+      next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, fromId);
+      return next;
+    });
+  }, []);
+
+  const saveActive = useCallback(() => {
+    setActiveNoteId((curId) => {
+      if (curId) {
+        setSavedContents((prev) => ({ ...prev, [curId]: noteContents[curId] ?? '' }));
+      }
+      return curId;
+    });
+  }, [noteContents]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveActive();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [saveActive]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent, item: NoteItem) => {
     e.preventDefault();
@@ -366,9 +420,9 @@ const Notes: React.FC = () => {
 
   const deleteItem = useCallback((id: string) => {
     setNotes((prev) => removeItem(prev, id));
-    if (activeNoteId === id) setActiveNoteId(null);
+    closeTab(id);
     closeContextMenu();
-  }, [activeNoteId, closeContextMenu]);
+  }, [closeTab, closeContextMenu]);
 
   const createNewNote = useCallback(() => {
     const newNote: NoteItem = {
@@ -550,8 +604,70 @@ const Notes: React.FC = () => {
 
       {/* Content area */}
       <main className="notes-content">
+        {openTabs.length > 0 && (
+          <div className="notes-tabs" role="tablist">
+            {openTabs.map((tabId) => {
+              const tabNote = findNote(notes, tabId);
+              if (!tabNote) return null;
+              const isActive = tabId === activeNoteId;
+              const current = noteContents[tabId] ?? '';
+              const saved = savedContents[tabId] ?? '';
+              const isDirty = current !== saved;
+              const isDragOver = dragOverTabId === tabId && dragTabId !== tabId;
+              return (
+                <div
+                  key={tabId}
+                  role="tab"
+                  className={`notes-tab ${isActive ? 'active' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                  draggable
+                  onClick={() => setActiveNoteId(tabId)}
+                  onDragStart={(e) => {
+                    setDragTabId(tabId);
+                    e.dataTransfer.effectAllowed = 'move';
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (dragOverTabId !== tabId) setDragOverTabId(tabId);
+                  }}
+                  onDragLeave={() => {
+                    if (dragOverTabId === tabId) setDragOverTabId(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (dragTabId) reorderTabs(dragTabId, tabId);
+                    setDragTabId(null);
+                    setDragOverTabId(null);
+                  }}
+                  onDragEnd={() => {
+                    setDragTabId(null);
+                    setDragOverTabId(null);
+                  }}
+                  title={tabNote.name}
+                >
+                  <span className="notes-tab-icon">{FileTextIcon({ size: 13 })}</span>
+                  <span className="notes-tab-label">{tabNote.name}</span>
+                  <button
+                    className={`notes-tab-close ${isDirty ? 'dirty' : ''}`}
+                    title={isDirty ? 'Unsaved changes — click to close' : 'Close tab'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeTab(tabId);
+                    }}
+                  >
+                    <span className="notes-tab-close-x">{XIcon({ size: 12 })}</span>
+                    {isDirty && (
+                      <span className="notes-tab-close-dot">{CircleDotIcon({ size: 10 })}</span>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
         {activeNote ? (
           <MarkdownEditor
+            key={activeNote.id}
             content={noteContents[activeNote.id] || ''}
             onChange={(content) =>
               setNoteContents((prev) => ({ ...prev, [activeNote.id]: content }))

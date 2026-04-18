@@ -5,7 +5,6 @@ import Subjects from './pages/Subjects'
 import Faq from './pages/Faq'
 import Contact from './pages/Contact'
 import Notes from './pages/Notes'
-
 function App() {
   return (
     <div className="app">

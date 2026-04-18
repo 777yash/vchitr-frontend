@@ -398,6 +398,143 @@
   line-height: 1.6;
 }
 
+/* ===== Tabs Bar ===== */
+.notes-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  background-color: var(--sidebar-bg);
+  border-bottom: 1px solid var(--sidebar-border);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  flex-shrink: 0;
+}
+
+.notes-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.notes-tabs::-webkit-scrollbar-thumb {
+  background-color: var(--sidebar-border);
+  border-radius: 4px;
+}
+
+.notes-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem 0.45rem 0.75rem;
+  min-width: 110px;
+  max-width: 200px;
+  background-color: transparent;
+  border-right: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.15s ease;
+  font-size: 0.82rem;
+  color: var(--notes-text);
+  opacity: 0.7;
+}
+
+.notes-tab:hover {
+  background-color: var(--sidebar-hover);
+  opacity: 1;
+}
+
+.notes-tab.active {
+  background-color: var(--sidebar-active);
+  opacity: 1;
+}
+
+.notes-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background-color: var(--notes-text);
+}
+
+.notes-tab.drag-over {
+  background-color: var(--sidebar-hover);
+  box-shadow: inset 2px 0 0 var(--notes-text);
+}
+
+.notes-tab-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.notes-tab-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 450;
+}
+
+.notes-tab-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem;
+  border-radius: 4px;
+  color: var(--notes-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  position: relative;
+}
+
+.notes-tab-close-x {
+  display: flex;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.notes-tab-close-dot {
+  position: absolute;
+  display: flex;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.notes-tab:hover .notes-tab-close-x,
+.notes-tab.active .notes-tab-close-x {
+  opacity: 0.7;
+}
+
+.notes-tab-close.dirty .notes-tab-close-dot {
+  opacity: 0.85;
+}
+
+.notes-tab-close.dirty:hover .notes-tab-close-x,
+.notes-tab:hover .notes-tab-close.dirty .notes-tab-close-x {
+  opacity: 1;
+}
+
+.notes-tab-close.dirty:hover .notes-tab-close-dot,
+.notes-tab:hover .notes-tab-close.dirty:hover .notes-tab-close-dot {
+  opacity: 0;
+}
+
+.notes-tab-close:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.notes-tab-close:hover .notes-tab-close-x {
+  opacity: 1;
+}
+
 /* ===== Context Menu ===== */
 .context-menu-overlay {
   position: fixed;
