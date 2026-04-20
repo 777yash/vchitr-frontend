@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .gstack/
 CLAUDE.md
+
+# Local env
+.env
+.env.local
