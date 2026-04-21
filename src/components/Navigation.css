@@ -203,6 +203,15 @@
   align-items: center;
   gap: 0.5rem;
   max-width: 160px;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.navbar-user:hover {
+  background: var(--nav-border, rgba(0, 0, 0, 0.06));
 }
 
 .navbar-user-avatar {
@@ -307,6 +316,12 @@
   font-size: 0.9rem;
   color: #ccc;
   margin-right: 0.25rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.home-auth-user:hover {
+  color: #fff;
 }
 
 .home-auth-btn {

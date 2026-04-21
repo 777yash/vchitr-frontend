@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login, me, googleLogin } from '../api/auth';
 import { extractApiError } from '../api/client';
+import { getProfile } from '../api/profile';
 import {
   loadGoogleScript,
   getGoogleClientId,
@@ -25,7 +26,8 @@ const Login: React.FC = () => {
     try {
       await googleLogin(res.credential);
       await me();
-      navigate('/');
+      const profile = await getProfile();
+      navigate(profile.onboarding_completed ? '/' : '/onboarding');
     } catch (err) {
       setError(extractApiError(err, 'Google sign-in failed.'));
     } finally {
@@ -78,7 +80,8 @@ const Login: React.FC = () => {
     try {
       await login(email, password);
       await me();
-      navigate('/');
+      const profile = await getProfile();
+      navigate(profile.onboarding_completed ? '/' : '/onboarding');
     } catch (err) {
       setError(extractApiError(err, 'Login failed.'));
     } finally {

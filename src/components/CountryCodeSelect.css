@@ -1,0 +1,164 @@
+.cc-select {
+  position: relative;
+  width: 100%;
+  font-family: inherit;
+}
+
+.cc-select-input {
+  width: 100%;
+  padding: 0.7rem 2.1rem 0.7rem 0.9rem;
+  background: var(--cc-bg);
+  border: 1px solid var(--cc-border);
+  border-radius: 6px;
+  color: var(--cc-text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.cc-select-input:focus {
+  outline: none;
+  border-color: var(--cc-focus-border);
+  background: var(--cc-focus-bg);
+}
+
+.cc-select-input::placeholder {
+  color: var(--cc-placeholder);
+  opacity: 1;
+}
+
+.cc-select-caret {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--cc-text);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.cc-select-clear {
+  position: absolute;
+  right: 1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--cc-text);
+  opacity: 0.45;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cc-select-clear:hover {
+  opacity: 0.9;
+}
+
+.cc-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  background: var(--cc-menu-bg);
+  border: 1px solid var(--cc-border);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  color: var(--cc-text);
+  min-width: 240px;
+}
+
+.cc-select-option {
+  display: grid;
+  grid-template-columns: 34px auto 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cc-highlight,
+.cc-select-option:hover {
+  background: var(--cc-highlight);
+}
+
+.cc-selected {
+  font-weight: 600;
+}
+
+.cc-iso {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-dial {
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-name {
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cc-select-empty {
+  padding: 0.75rem;
+  text-align: center;
+  color: var(--cc-placeholder);
+  font-size: 0.9rem;
+}
+
+.cc-select-disabled .cc-select-input {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cc-select-dark {
+  --cc-bg: rgba(255, 255, 255, 0.05);
+  --cc-border: rgba(255, 255, 255, 0.15);
+  --cc-text: #fff;
+  --cc-focus-border: rgba(255, 255, 255, 0.5);
+  --cc-focus-bg: rgba(255, 255, 255, 0.08);
+  --cc-placeholder: #777;
+  --cc-menu-bg: #0f0f0f;
+  --cc-highlight: rgba(255, 255, 255, 0.1);
+}
+
+.cc-select-profile {
+  --cc-bg: var(--bg-color, #fff);
+  --cc-border: var(--card-border, rgba(0, 0, 0, 0.15));
+  --cc-text: var(--text-color, #000);
+  --cc-focus-border: var(--text-color, #000);
+  --cc-focus-bg: var(--bg-color, #fff);
+  --cc-placeholder: rgba(0, 0, 0, 0.45);
+  --cc-menu-bg: var(--bg-color, #fff);
+  --cc-highlight: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .cc-select-profile {
+  --cc-bg: rgba(255, 255, 255, 0.04);
+  --cc-border: rgba(255, 255, 255, 0.12);
+  --cc-text: #fff;
+  --cc-focus-border: rgba(255, 255, 255, 0.55);
+  --cc-focus-bg: rgba(255, 255, 255, 0.08);
+  --cc-placeholder: rgba(255, 255, 255, 0.35);
+  --cc-menu-bg: #141414;
+  --cc-highlight: rgba(255, 255, 255, 0.08);
+}

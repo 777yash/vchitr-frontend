@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signup, login, me } from '../api/auth';
 import { extractApiError } from '../api/client';
+import { getProfile } from '../api/profile';
 import './Auth.css';
 
 const Signup: React.FC = () => {
@@ -39,7 +40,8 @@ const Signup: React.FC = () => {
       await signup(email, username, password);
       await login(email, password);
       await me();
-      navigate('/');
+      const profile = await getProfile();
+      navigate(profile.onboarding_completed ? '/' : '/onboarding');
     } catch (err) {
       setError(extractApiError(err, 'Signup failed.'));
     } finally {

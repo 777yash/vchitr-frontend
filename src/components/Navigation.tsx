@@ -185,7 +185,9 @@ const Navigation: React.FC = () => {
         <div className="home-floating-auth">
           {user ? (
             <>
-              <span className="home-auth-user">Hi, {user.username}</span>
+              <Link to="/profile" className="home-auth-user">
+                Hi, {user.username}
+              </Link>
               <button
                 className="home-auth-btn home-auth-ghost"
                 onClick={handleLogout}
@@ -254,12 +256,17 @@ const Navigation: React.FC = () => {
           <div className="navbar-actions">
             {user ? (
               <div className="navbar-auth">
-                <span className="navbar-user" title={user.email}>
+                <Link
+                  to="/profile"
+                  className="navbar-user"
+                  title={user.email}
+                  onClick={closeNav}
+                >
                   <span className="navbar-user-avatar" aria-hidden="true">
                     {user.username.charAt(0).toUpperCase()}
                   </span>
                   <span className="navbar-user-name">{user.username}</span>
-                </span>
+                </Link>
                 <button
                   className="navbar-auth-btn navbar-auth-ghost"
                   onClick={handleLogout}
