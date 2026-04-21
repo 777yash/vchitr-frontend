@@ -32,6 +32,12 @@ export async function login(email: string, password: string): Promise<string> {
   return data.access_token;
 }
 
+export async function googleLogin(credential: string): Promise<string> {
+  const { data } = await api.post<Token>('/auth/google', { credential });
+  localStorage.setItem(TOKEN_KEY, data.access_token);
+  return data.access_token;
+}
+
 export async function me(): Promise<UserOut> {
   const { data } = await api.get<UserOut>('/auth/me');
   localStorage.setItem(USER_KEY, JSON.stringify({ username: data.username, email: data.email }));
