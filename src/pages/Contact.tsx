@@ -1,27 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import RandomImageBackground from '../components/RandomImageBackground';
 import './Contact.css';
 
 const Contact: React.FC = () => {
-  const [bgImage, setBgImage] = useState('');
-
-  useEffect(() => {
-    const images = [
-      'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1920&auto=format&fit=crop', // Math
-      'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1920&auto=format&fit=crop', // Science
-      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1920&auto=format&fit=crop', // Comp sci
-      'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop', // Space
-      'https://images.unsplash.com/photo-1474511320723-9a56873864b5?q=80&w=1920&auto=format&fit=crop', // Animals (Fox)
-      'https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=1920&auto=format&fit=crop'  // Animals (Lion)
-    ];
-    setBgImage(images[Math.floor(Math.random() * images.length)]);
-  }, []);
-
   return (
-    <div 
-      className="contact-container"
-      style={{ backgroundImage: bgImage ? `url(${bgImage})` : 'none' }}
+    <RandomImageBackground
+      containerClassName="contact-container"
+      overlayClassName="contact-overlay"
     >
-      <div className="contact-overlay"></div>
       <div className="contact-card">
         <div className="contact-content">
           <p className="contact-preheading">Connect</p>
@@ -50,12 +36,12 @@ const Contact: React.FC = () => {
             </div>
 
             <button type="submit" className="btn btn-dark">
-              Subscribe
+              Send
             </button>
           </form>
         </div>
       </div>
-    </div>
+    </RandomImageBackground>
   );
 };
 
