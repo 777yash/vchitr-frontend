@@ -9,6 +9,8 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
+import SubjectSelection from './pages/SubjectSelection'
+import Learning from './pages/Learning'
 function App() {
   return (
     <div className="app">
@@ -24,6 +26,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/subjects/:mode" element={<SubjectSelection />} />
+        <Route path="/learning/:subjectName" element={<Learning />} />
       </Routes>
     </div>
   )

@@ -14,10 +14,10 @@ const Home: React.FC = () => {
         <h1 className="home-title">vCHITR</h1>
         <p className="home-subtitle">vCHITR keeps your thoughts in one place.</p>
         <div className="home-buttons">
-          <button className="btn btn-primary" onClick={() => navigate('/subjects')}>
+          <button className="btn btn-primary" onClick={() => navigate('/subjects/competitive')}>
             Competitive
           </button>
-          <button className="btn btn-secondary" onClick={() => navigate('/notes')}>
+          <button className="btn btn-secondary" onClick={() => navigate('/subjects/learning')}>
             Learning
           </button>
         </div>

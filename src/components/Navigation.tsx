@@ -229,14 +229,6 @@ const Navigation: React.FC = () => {
               Subjects
             </Link>
             <Link
-              to="/notes"
-              className={`nav-link ${isActive('/notes') ? 'active' : ''}`}
-              aria-current={isActive('/notes') ? 'page' : undefined}
-              onClick={closeNav}
-            >
-              Notes
-            </Link>
-            <Link
               to="/faq"
               className={`nav-link ${isActive('/faq') ? 'active' : ''}`}
               aria-current={isActive('/faq') ? 'page' : undefined}
