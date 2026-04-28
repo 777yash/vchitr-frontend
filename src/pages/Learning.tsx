@@ -25,12 +25,17 @@ function getChapters(subject: string): string[] {
 
 const Learning: React.FC = () => {
   const { subjectName } = useParams<{ subjectName: string }>();
-  const subject = subjectName ? decodeURIComponent(subjectName) : 'Subject';
+  const subject  = subjectName ? decodeURIComponent(subjectName) : 'Subject';
   const chapters = getChapters(subject);
 
   const [chapterProgress] = useState<Record<string, number>>(
     () => Object.fromEntries(chapters.map((ch) => [ch, 0]))
   );
+  const [activeChapter, setActiveChapter] = useState<string | null>(
+    chapters.length > 0 ? chapters[0] : null
+  );
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const overallProgress =
     chapters.length === 0
@@ -38,12 +43,6 @@ const Learning: React.FC = () => {
       : Math.round(
           chapters.reduce((sum, ch) => sum + (chapterProgress[ch] ?? 0), 0) / chapters.length
         );
-
-  const [activeChapter, setActiveChapter] = useState<string | null>(
-    chapters.length > 0 ? chapters[0] : null
-  );
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="learning-page">
@@ -119,7 +118,9 @@ const Learning: React.FC = () => {
           <div className="lc-chapter-content">
             <div className="lc-chapter-header">
               <h1 className="lc-chapter-title">{activeChapter}</h1>
-              <p className="lc-chapter-meta-text">{subject} · {chapters.indexOf(activeChapter) + 1} of {chapters.length}</p>
+              <p className="lc-chapter-meta-text">
+                {subject} · {chapters.indexOf(activeChapter) + 1} of {chapters.length}
+              </p>
             </div>
 
             <div className="lc-submodules">
