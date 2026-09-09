@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getToken } from '../api/auth';
 import { extractApiError } from '../api/client';
 import {
@@ -20,6 +20,7 @@ const MAX_DOB = new Date().toISOString().slice(0, 10);
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -116,7 +117,10 @@ const Onboarding: React.FC = () => {
     try {
       const updated: ProfileOut = await submitOnboarding(payload);
       if (updated.onboarding_completed) {
-        navigate('/', { replace: true });
+        const from = location.state?.from;
+        const returnTo = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
+          && from !== '/onboarding' ? from : '/';
+        navigate(returnTo, { replace: true });
       } else {
         setError('Onboarding did not complete. Please try again.');
       }

@@ -93,7 +93,7 @@ function highlightMarkdown(text: string): string {
     .replace(/(\*\*[^*]+\*\*)/g, '<span class="md-bold">$1</span>')
     .replace(/(__[^_]+__)/g, '<span class="md-bold">$1</span>')
     .replace(/(\*[^*]+\*)/g, '<span class="md-italic">$1</span>')
-    .replace(/(\_[^_]+\_)/g, '<span class="md-italic">$1</span>')
+    .replace(/(_[^_]+_)/g, '<span class="md-italic">$1</span>')
     .replace(/(`[^`]+`)/g, '<span class="md-code">$1</span>')
     .replace(/(\[[^\]]*\]\([^)]*\))/g, '<span class="md-link">$1</span>')
     .replace(/(!\[[^\]]*\]\([^)]*\))/g, '<span class="md-img">$1</span>')

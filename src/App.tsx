@@ -11,23 +11,26 @@ import Onboarding from './pages/Onboarding'
 import Profile from './pages/Profile'
 import SubjectSelection from './pages/SubjectSelection'
 import Learning from './pages/Learning'
+import RequireAuth from './components/RequireAuth'
 function App() {
   return (
     <div className="app">
       <Navigation />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/subjects" element={<Subjects />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/notes" element={<Notes />} />
-        <Route path="/notes/:subjectName" element={<Notes />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/subjects/:mode" element={<SubjectSelection />} />
-        <Route path="/learning/:subjectName" element={<Learning />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/subjects" element={<Subjects />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/notes/:subjectName" element={<Notes />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/subjects/:mode" element={<SubjectSelection />} />
+          <Route path="/learning/:subjectName" element={<Learning />} />
+        </Route>
       </Routes>
     </div>
   )

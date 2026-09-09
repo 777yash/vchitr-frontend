@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { me, logout, getStoredUser, getToken } from '../api/auth';
+import { SESSION_CHANGED } from '../api/client';
 import './Navigation.css';
 
 interface CurrentUser {
@@ -30,6 +31,16 @@ const Navigation: React.FC = () => {
   const dragged = useRef(false);
   const navRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const syncSession = () => setUser(getToken() ? getStoredUser() : null);
+    window.addEventListener(SESSION_CHANGED, syncSession);
+    window.addEventListener('storage', syncSession);
+    return () => {
+      window.removeEventListener(SESSION_CHANGED, syncSession);
+      window.removeEventListener('storage', syncSession);
+    };
+  }, []);
 
   // Sync theme attribute with state
   useEffect(() => {

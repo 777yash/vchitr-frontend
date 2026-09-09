@@ -16,12 +16,14 @@ const SubjectSelection: React.FC = () => {
 
   useEffect(() => {
     if (!isLearning) return;
-    setLoading(true);
-    setError('');
+    let cancelled = false;
     getSubModules()
-      .then(setSubjects)
-      .catch((err) => setError(extractApiError(err)))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (!cancelled) { setSubjects(data); setError(''); }
+      })
+      .catch((err) => { if (!cancelled) setError(extractApiError(err)); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [isLearning]);
 
   if (!isLearning) {

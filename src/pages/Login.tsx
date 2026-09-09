@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { login, me, googleLogin } from '../api/auth';
 import { extractApiError } from '../api/client';
 import { getProfile } from '../api/profile';
@@ -12,6 +12,10 @@ import './Auth.css';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
+  const returnTo = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
+    ? from : '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +31,9 @@ const Login: React.FC = () => {
       await googleLogin(res.credential);
       await me();
       const profile = await getProfile();
-      navigate(profile.onboarding_completed ? '/' : '/onboarding');
+      navigate(profile.onboarding_completed ? returnTo : '/onboarding', {
+        replace: true, state: { from: returnTo },
+      });
     } catch (err) {
       setError(extractApiError(err, 'Google sign-in failed.'));
     } finally {
@@ -81,7 +87,9 @@ const Login: React.FC = () => {
       await login(email, password);
       await me();
       const profile = await getProfile();
-      navigate(profile.onboarding_completed ? '/' : '/onboarding');
+      navigate(profile.onboarding_completed ? returnTo : '/onboarding', {
+        replace: true, state: { from: returnTo },
+      });
     } catch (err) {
       setError(extractApiError(err, 'Login failed.'));
     } finally {

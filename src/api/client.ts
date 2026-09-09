@@ -5,8 +5,15 @@ const baseURL =
 
 export const TOKEN_KEY = 'vchitr-token';
 export const USER_KEY = 'vchitr-current-user';
+export const SESSION_CHANGED = 'vchitr-session-changed';
 
-export const api = axios.create({ baseURL });
+export function clearSession(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  window.dispatchEvent(new Event(SESSION_CHANGED));
+}
+
+export const api = axios.create({ baseURL, timeout: 15000 });
 
 api.interceptors.request.use((cfg) => {
   const token = localStorage.getItem(TOKEN_KEY);
@@ -19,9 +26,10 @@ api.interceptors.request.use((cfg) => {
 api.interceptors.response.use(
   (res) => res,
   (err: AxiosError) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (err.response?.status === 401 && token &&
+        err.config?.headers.Authorization === `Bearer ${token}`) {
+      clearSession();
     }
     return Promise.reject(err);
   }
