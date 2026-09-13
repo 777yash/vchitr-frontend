@@ -16,6 +16,7 @@ import {
   type ProfileUpdate,
 } from '../api/profile';
 import CountryCodeSelect from '../components/CountryCodeSelect';
+import LearningPreferences from '../components/LearningPreferences';
 import './Profile.css';
 
 const MAX_DOB = new Date().toISOString().slice(0, 10);
@@ -446,6 +447,7 @@ const Profile: React.FC = () => {
             </div>
           </dl>
         )}
+        <LearningPreferences />
       </div>
     </div>
   );

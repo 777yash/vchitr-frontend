@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getSubModules } from '../api/modules';
 import type { SubModule } from '../api/modules';
 import { extractApiError } from '../api/client';
@@ -59,22 +59,17 @@ const SubjectSelection: React.FC = () => {
       {!loading && !error && subjects.length > 0 && (
         <div className="subsel-grid">
           {subjects.map((s) => (
-            <div
+            <Link
               key={s.sub_module_id}
               className="subsel-card"
-              onClick={() => navigate(`/learning/${encodeURIComponent(s.sub_module_name)}`)}
+              to={`/learning/${encodeURIComponent(s.sub_module_name)}`}
             >
               <h2 className="subsel-name">{s.sub_module_name}</h2>
               {s.sub_module_description && (
                 <p className="subsel-desc">{s.sub_module_description}</p>
               )}
-              <div className="subsel-progress-wrap">
-                <div className="subsel-progress-track">
-                  <div className="subsel-progress-fill" style={{ width: '0%' }} />
-                </div>
-                <span className="subsel-progress-label">0%</span>
-              </div>
-            </div>
+              <span className="subsel-progress-label">Open learning →</span>
+            </Link>
           ))}
         </div>
       )}

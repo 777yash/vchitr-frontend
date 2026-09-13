@@ -303,3 +303,10 @@
     grid-template-columns: 120px 1fr;
   }
 }
+/* Per-subject learning preferences */
+.profile-learning { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--input-border); }
+.profile-learning-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
+.profile-learning-row label { font-weight: 600; min-width: 80px; }
+.profile-learning-row select { padding: 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--bg-color); color: var(--text-color); max-width: 100%; }
+.profile-learning-row a { color: inherit; text-underline-offset: 4px; }
+.profile-learning-row [role="alert"] { flex-basis: 100%; }
