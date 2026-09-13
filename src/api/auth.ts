@@ -1,4 +1,5 @@
 import { api, clearSession, SESSION_CHANGED, TOKEN_KEY, USER_KEY } from './client';
+import { createSessionCache } from './sessionCache';
 
 export interface UserOut {
   id: number;
@@ -42,9 +43,18 @@ export async function googleLogin(credential: string): Promise<string> {
   return data.access_token;
 }
 
-export async function me(): Promise<UserOut> {
+const session = createSessionCache<UserOut>(getToken, async (token) => {
+  const { data } = await api.get<UserOut>('/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+  return data;
+});
+window.addEventListener(SESSION_CHANGED, session.sync);
+window.addEventListener('storage', session.sync);
+
+export function getVerifiedUser(): UserOut | undefined { return session.peek(); }
+
+export async function me(force = false): Promise<UserOut> {
   const token = getToken();
-  const { data } = await api.get<UserOut>('/auth/me');
+  const data = await session.get(force);
   if (token === getToken()) {
     localStorage.setItem(USER_KEY, JSON.stringify({ username: data.username, email: data.email }));
     window.dispatchEvent(new Event(SESSION_CHANGED));

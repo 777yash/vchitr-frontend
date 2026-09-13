@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { me, logout, getStoredUser, getToken } from '../api/auth';
 import { SESSION_CHANGED } from '../api/client';
@@ -9,7 +9,17 @@ interface CurrentUser {
   email: string;
 }
 
+function subscribeToken(listener: () => void) {
+  window.addEventListener(SESSION_CHANGED, listener);
+  window.addEventListener('storage', listener);
+  return () => {
+    window.removeEventListener(SESSION_CHANGED, listener);
+    window.removeEventListener('storage', listener);
+  };
+}
+
 const Navigation: React.FC = () => {
+  const token = useSyncExternalStore(subscribeToken, getToken);
   const location = useLocation();
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => {
@@ -53,11 +63,11 @@ const Navigation: React.FC = () => {
     return () => window.removeEventListener('toggle-main-nav', handleToggle);
   }, []);
 
-  // Verify auth on mount + when route changes (catches login/logout from other pages)
+  // Share verification with the route guard; navigation itself does not recheck auth.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (!getToken()) {
+      if (!token) {
         if (!cancelled) setUser(null);
         return;
       }
@@ -71,7 +81,7 @@ const Navigation: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [location.pathname]);
+  }, [token]);
 
   // Close on Escape
   useEffect(() => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import StarsBackground from '../components/StarsBackground';
 import './Home.css';
+import { preloadSubjects } from '../api/modules';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Home: React.FC = () => {
           <button className="btn btn-primary" onClick={() => navigate('/subjects/competitive')}>
             Competitive
           </button>
-          <button className="btn btn-secondary" onClick={() => navigate('/subjects/learning')}>
+          <button className="btn btn-secondary" onPointerEnter={preloadSubjects} onFocus={preloadSubjects} onClick={() => { preloadSubjects(); navigate('/subjects/learning'); }}>
             Learning
           </button>
         </div>

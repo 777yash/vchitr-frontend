@@ -18,7 +18,7 @@ export default function Learning() {
 }
 
 function SubjectCourse({ subjectName }: { subjectName: string }) {
-  const { data: subject, error, reload } = useLearningResource<SubjectPreference>('/subjects/' + encodeURIComponent(subjectName));
+  const { data: subject, error, reload } = useLearningResource<SubjectPreference>('/subjects/' + encodeURIComponent(subjectName) + '?include_course=true');
   const [busy, setBusy] = useState(false);
   const [saveError, setSaveError] = useState('');
   async function selectLevel(level: string) {
@@ -28,6 +28,8 @@ function SubjectCourse({ subjectName }: { subjectName: string }) {
     catch (err) { setSaveError(extractApiError(err)); }
     finally { setBusy(false); }
   }
+  if (subject?.course) return <CourseWorkspace key={subject.course.id} course={subject.course} reload={reload} />;
+  // Backward compatible while the backend update rolls out.
   if (subject?.courseId) return <CourseLoader key={subject.courseId} courseId={subject.courseId} />;
   return <main className="course-shell">
     <Link to="/subjects/learning">← All subjects</Link>

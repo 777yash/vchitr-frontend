@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { getToken, me } from '../api/auth';
+import { getToken, getVerifiedUser, me } from '../api/auth';
 import { extractApiError, SESSION_CHANGED } from '../api/client';
 import '../pages/Auth.css';
 
@@ -24,7 +24,7 @@ export default function RequireAuth() {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    me().then(
+    me(attempt > 0).then(
       () => { if (!cancelled) setResult({ token, attempt }); },
       (err) => {
         if (!cancelled) setResult({ token, attempt, error: extractApiError(err) });
@@ -40,7 +40,7 @@ export default function RequireAuth() {
   }
 
   const current = result?.token === token && result.attempt === attempt ? result : null;
-  if (current && !current.error) return <Outlet key={token} />;
+  if ((current && !current.error) || (!current && attempt === 0 && getVerifiedUser())) return <Outlet key={token} />;
 
   return (
     <div className="auth-container">

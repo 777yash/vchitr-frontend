@@ -18,6 +18,17 @@ export function getModules(): Promise<Module[]> {
   return api.get<Module[]>('/module/getModules/').then((r) => r.data);
 }
 
+// Public catalog metadata only; lessons, tests and results are never cached here.
+let catalog: { data: SubModule[]; expires: number } | undefined;
+let pendingCatalog: Promise<SubModule[]> | undefined;
 export function getSubModules(): Promise<SubModule[]> {
-  return api.get<SubModule[]>('/module/getSubModules/').then((r) => r.data);
+  if (catalog && Date.now() < catalog.expires) return Promise.resolve(catalog.data);
+  if (pendingCatalog) return pendingCatalog;
+  pendingCatalog = api.get<SubModule[]>('/module/getSubModules/').then(({ data }) => {
+    catalog = { data, expires: Date.now() + 30_000 };
+    return data;
+  }).finally(() => { pendingCatalog = undefined; });
+  return pendingCatalog;
 }
+
+export function preloadSubjects(): void { void getSubModules().catch(() => {}); }

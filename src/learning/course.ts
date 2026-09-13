@@ -2,6 +2,7 @@ export interface StudyLevel { id: string; title: string; description: string; av
 export interface SubjectPreference {
   subjectId: string; subjectName: string; selectedLevel: string | null;
   courseId: string | null; levels: StudyLevel[];
+  course?: Course | null;
 }
 export interface ChapterSummary { id: string; title: string }
 export interface Lesson extends ChapterSummary {

@@ -54,7 +54,15 @@ The configured `vchitr-main` database lives on the Neon branch named `developmen
 
 The level remains curriculum scope; weak chapter performance does not change a student's school level. A future generator can select recent missed concepts and create a validated question snapshot within the chosen chapter and level. Keep the current server-owned attempt IDs, ownership checks, snapshot grading, idempotent submission and final coverage rules. Validate generated math and schema before publishing, with the fixed bank available as a fallback. No LLM calls are implemented in this release.
 
-## Verification
+## Loading performance
+
+Session verification is shared by Navigation and RequireAuth: one in-flight request, 60-second memory reuse, and invalidation on token change/logout. Failed validation remains retryable. Every protected backend request still authenticates the user. A cached display name alone never counts as verified authentication.
+
+Home preloads the public subject catalog on pointer hover, keyboard focus and click so it can run alongside session verification. Catalog metadata is reused for 30 seconds in memory. Coursework, saved levels and results are still retrieved fresh on each resource opening.
+
+Maths requests `GET /learning/subjects/Maths?include_course=true` for the saved level and course overview together. Older backends can ignore this optional flag; the frontend then uses the existing separate course request. Deploying the matching backend enables both the combined response and connection pooling.
+
+## Verification checks
 
 Backend: `python -m unittest discover -s tests -v` — 20 regressions cover auth, preferences, level switching, ownership, key redaction, saved drafts, snapshots, grading, retakes, resets, final eligibility and the 14-chapter/84-question seed.
 
