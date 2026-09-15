@@ -61,3 +61,7 @@
   .course-summary { grid-template-columns: 1fr; } .course-summary > div { padding: 12px 20px; }
   .course-summary strong { font-size: 1.4rem; } .course-panel, .course-question { padding: 18px; }
 }
+.concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.concept-feedback { margin: 24px 0; }
+.concept-feedback summary { cursor: pointer; text-decoration: underline; }
+.concept-feedback details[open] { padding-top: 8px; }
