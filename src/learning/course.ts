@@ -5,9 +5,17 @@ export interface SubjectPreference {
   course?: Course | null;
 }
 export interface ChapterSummary { id: string; title: string }
+export type ExplanationTier = 'beginner' | 'default' | 'advanced';
+export interface GeneratedLesson {
+  summary: string;
+  sections: { title: string; explanation: string[]; example: { problem: string; steps: string[] }; checkYourself: string }[];
+  takeaways: string[];
+}
 export interface Lesson extends ChapterSummary {
   goal: string; concepts: string[]; example: { problem: string; steps: string[] };
   watchFor: string; questionCount: number; adaptiveAvailable?: boolean;
+  contentVariant?: { requestedTier: ExplanationTier; servedTier: ExplanationTier; status: 'base' | 'ready' | 'unavailable'; generationId: string | null; verified: boolean; generated: GeneratedLesson | null;
+    selection: { tier: ExplanationTier; evidenceCount: number; percent: number | null; reason: 'more-evidence-needed' | 'chapter-results' } } | null;
 }
 export interface Question {
   id: string; concept: string; difficulty: string; prompt: string; options: string[];

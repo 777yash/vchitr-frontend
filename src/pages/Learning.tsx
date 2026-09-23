@@ -7,6 +7,7 @@ import { recommendation, testScores } from '../learning/progress';
 import type { Attempt, Course, Lesson, SubjectPreference, Test } from '../learning/course';
 import './LearningCourse.css';
 import ConceptFeedback from '../components/ConceptFeedback';
+import LessonContent from '../components/LessonContent';
 
 function LoadingState({ error, retry }: { error?: string; retry: () => void }) {
   return error ? <div><p role="alert" className="course-alert">{error}</p><button className="course-button" onClick={retry}>Retry loading</button></div>
@@ -126,9 +127,13 @@ function LessonLoader({ course, chapterId, onTest, reloadCourse }: { course: Cou
   return <article>
     <p className="course-eyebrow">{course.title} · Chapter {Number(chapterId.slice(3))}</p><h1>{lesson.title}</h1><p className="course-lead">{lesson.goal}</p>
     <a className="course-source" href={'https://ncert.nic.in/textbook/pdf/jemh1' + chapterId.slice(3) + '.pdf'} target="_blank" rel="noreferrer">Read the NCERT chapter ↗</a>
-    <section className="course-panel"><h2>Core concepts</h2>{lesson.concepts.map((text) => <p key={text}>{text}</p>)}</section>
-    <section className="course-panel worked-example"><p className="course-eyebrow">Worked example</p><h2>{lesson.example.problem}</h2><ol>{lesson.example.steps.map((text) => <li key={text}>{text}</li>)}</ol></section>
-    <section className="course-panel"><h2>Watch for this</h2><p>{lesson.watchFor}</p></section>
+    {lesson.contentVariant && <div className="course-panel">
+      <h2>Explanation depth: {lesson.contentVariant.servedTier === 'beginner' ? 'Beginner · more guidance' : lesson.contentVariant.servedTier === 'advanced' ? 'Advanced · deeper exploration' : 'Default · original lesson'}</h2>
+      <p className="course-muted">{lesson.contentVariant.selection.reason === 'more-evidence-needed'
+        ? 'Starting with the original lesson while we collect more answers across this chapter’s concepts.'
+        : 'Selected from your recent first answers to distinct chapter questions. Repeating questions does not add evidence.'} Your saved education level stays unchanged.</p>
+    </div>}
+    <LessonContent lesson={lesson} />
     {saveError && <p role="alert" className="course-alert">{saveError}</p>}
     <div className="course-actions"><button className="course-button" disabled={read || busy} onClick={markRead}>{read ? '✓ Marked as read' : busy ? 'Saving…' : 'Mark as read'}</button><button className="course-button primary" onClick={onTest}>Open chapter practice →</button></div>
     <p className="course-muted">{lesson.questionCount} fixed questions · no time limit · explanations after submission.</p>
