@@ -4,6 +4,9 @@ import { getSubModules } from '../api/modules';
 import type { SubModule } from '../api/modules';
 import { extractApiError } from '../api/client';
 import './SubjectSelection.css';
+import './LearningCourse.css';
+import LearningReveal from '../components/LearningReveal';
+import LearningSkeleton from '../components/LearningSkeleton';
 
 const SubjectSelection: React.FC = () => {
   const { mode } = useParams<{ mode: string }>();
@@ -43,27 +46,30 @@ const SubjectSelection: React.FC = () => {
   }
 
   return (
-    <div className="subsel-container">
+    <div className="subsel-container learning-surface learning-selection">
       <div className="subsel-header">
         <button className="subsel-back" onClick={() => navigate('/')}>← Back</button>
-        <h1 className="subsel-title">Learning</h1>
-        <p className="subsel-subtitle">Select a subject to begin</p>
+        <p className="course-eyebrow">A little curiosity goes a long way</p>
+        <h1 className="subsel-title">Make room for discovery.</h1>
+        <p className="subsel-subtitle">Choose a subject. Find your pace. Build your understanding.</p>
       </div>
 
-      {loading && <p className="subsel-status">Loading...</p>}
+      {loading && <LearningSkeleton />}
       {error   && <p className="subsel-status subsel-error">{error}</p>}
       {!loading && !error && subjects.length === 0 && (
         <p className="subsel-status">No subjects found.</p>
       )}
 
       {!loading && !error && subjects.length > 0 && (
-        <div className="subsel-grid">
+        <LearningReveal className="subsel-grid">
           {subjects.map((s) => (
             <Link
               key={s.sub_module_id}
               className="subsel-card"
               to={`/learning/${encodeURIComponent(s.sub_module_name)}`}
             >
+              <span className="learning-subject-symbol" aria-hidden="true">{s.sub_module_name.toLowerCase().includes('math') ? '∑' : '↗'}</span>
+              <span className="course-eyebrow">Your next discovery</span>
               <h2 className="subsel-name">{s.sub_module_name}</h2>
               {s.sub_module_description && (
                 <p className="subsel-desc">{s.sub_module_description}</p>
@@ -71,7 +77,7 @@ const SubjectSelection: React.FC = () => {
               <span className="subsel-progress-label">Open learning →</span>
             </Link>
           ))}
-        </div>
+        </LearningReveal>
       )}
     </div>
   );

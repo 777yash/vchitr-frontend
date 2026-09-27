@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { api, extractApiError } from '../api/client';
 import { saveLearningLevel, useLearningResource } from '../api/learning';
@@ -8,10 +8,12 @@ import type { Attempt, Course, Lesson, SubjectPreference, Test } from '../learni
 import './LearningCourse.css';
 import ConceptFeedback from '../components/ConceptFeedback';
 import LessonContent from '../components/LessonContent';
+import LearningReveal from '../components/LearningReveal';
+import LearningSkeleton from '../components/LearningSkeleton';
 
 function LoadingState({ error, retry }: { error?: string; retry: () => void }) {
   return error ? <div><p role="alert" className="course-alert">{error}</p><button className="course-button" onClick={retry}>Retry loading</button></div>
-    : <p role="status">Loading from your account…</p>;
+    : <LearningSkeleton />;
 }
 
 export default function Learning() {
@@ -33,9 +35,9 @@ function SubjectCourse({ subjectName }: { subjectName: string }) {
   if (subject?.course) return <CourseWorkspace key={subject.course.id} course={subject.course} reload={reload} />;
   // Backward compatible while the backend update rolls out.
   if (subject?.courseId) return <CourseLoader key={subject.courseId} courseId={subject.courseId} />;
-  return <main className="course-shell">
+  return <main className="course-shell learning-surface">
     <Link to="/subjects/learning">← All subjects</Link>
-    {!subject ? <LoadingState error={error} retry={reload} /> : <>
+    {!subject ? <LoadingState error={error} retry={reload} /> : <LearningReveal>
       <p className="course-eyebrow">Learning / {subject.subjectName}</p>
       <h1>Where would you like to begin?</h1>
       <p className="course-lead">Choose once. Your level is saved to your account for this subject. Change it later in Profile.</p>
@@ -45,19 +47,19 @@ function SubjectCourse({ subjectName }: { subjectName: string }) {
         <h2>{level.title}</h2><p>{level.description}</p>
         <button className="course-button" disabled={busy || !level.available} onClick={() => selectLevel(level.id)}>{level.available ? busy ? 'Saving…' : 'Start ' + level.title.toLowerCase() + ' →' : 'Not available yet'}</button>
       </div>)}</div>
-    </>}
+    </LearningReveal>}
   </main>;
 }
 
 function CourseLoader({ courseId }: { courseId: string }) {
   const { data, error, reload } = useLearningResource<Course>('/courses/' + courseId);
   return data ? <CourseWorkspace course={data} reload={reload} />
-    : <main className="course-shell"><Link to="/subjects/learning">← All subjects</Link><LoadingState error={error} retry={reload} /></main>;
+    : <main className="course-shell learning-surface"><Link to="/subjects/learning">← All subjects</Link><LoadingState error={error} retry={reload} /></main>;
 }
 
 function CourseWorkspace({ course, reload }: { course: Course; reload: () => void }) {
   const [params, setParams] = useSearchParams();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const chapterDialog = useRef<HTMLDialogElement>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -67,7 +69,7 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
   const final = testScores(course.progress.history, 'final');
   function navigate(id?: string, test = false) {
     setParams(id ? { chapter: id, view: test ? 'test' : 'study' } : {});
-    setSidebarOpen(false); window.scrollTo({ top: 0 });
+    chapterDialog.current?.close(); window.scrollTo({ top: 0 });
   }
   async function reset() {
     setBusy(true); setError('');
@@ -75,10 +77,8 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
     catch (err) { setError(extractApiError(err)); }
     finally { setBusy(false); }
   }
-  return <div className="course-layout">
-    <button className="course-mobile-menu course-button" onClick={() => setSidebarOpen(!sidebarOpen)} aria-expanded={sidebarOpen} aria-controls="course-navigation">{sidebarOpen ? 'Close chapters' : 'Browse chapters'}</button>
-    <aside id="course-navigation" className={'course-sidebar ' + (sidebarOpen ? 'is-open' : '')} aria-label="Course chapters">
-      <Link to="/profile">Change level in Profile</Link>
+  const chapterNavigation = <>
+      <Link className="course-back-link" to="/subjects/learning">← All subjects</Link>
       <p className="course-eyebrow">Your saved course</p>
       <button className="course-overview-link" onClick={() => navigate()}>{course.title}</button>
       <p>{completed} / {course.chapters.length} chapter tests submitted</p>
@@ -86,13 +86,21 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
       <nav>{course.chapters.map((chapter, i) => {
         const scores = testScores(course.progress.history, chapter.id);
         return <button className={'course-chapter-link ' + (chapterId === chapter.id ? 'active' : '')} key={chapter.id} aria-current={chapterId === chapter.id ? 'page' : undefined} onClick={() => navigate(chapter.id)}>
-          <span>{String(i + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{scores.latest ? 'Latest ' + scores.latest.percent + '% · Best ' + scores.best + '%' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Not started'}</small></span>
+          <span className="course-chapter-number">{String(i + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{scores.latest ? '✓ Latest ' + scores.latest.percent + '% · Best ' + scores.best + '%' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Not started'}</small></span>
         </button>;
       })}</nav>
       <button className="course-button" onClick={() => navigate('final', true)}>Final test {course.progress.finalUnlocked ? '→' : '· Locked'}</button>
-    </aside>
+      <Link className="course-profile-link" to="/profile">Change level in Profile ↗</Link>
+  </>;
+  return <div className="course-layout learning-surface">
+    <button className="course-mobile-menu course-button" onClick={() => chapterDialog.current?.showModal()} aria-haspopup="dialog" aria-controls="course-navigation">Browse chapters <span aria-hidden="true">☰</span></button>
+    <aside className="course-sidebar" aria-label="Course chapters">{chapterNavigation}</aside>
+    <dialog ref={chapterDialog} id="course-navigation" className="course-chapter-dialog" aria-label="Course chapters" onClick={(event) => { if (event.target === event.currentTarget) chapterDialog.current?.close(); }}>
+      <div className="course-drawer-inner"><button className="course-button course-drawer-close" autoFocus onClick={() => chapterDialog.current?.close()}>Close chapters ×</button>{chapterNavigation}</div>
+    </dialog>
     <main className="course-main">
-      <p className="course-storage-note">Your level, saved drafts and results are stored in your account across devices.</p>
+      <div className="course-workspace-header"><Link to="/subjects/learning">Learning</Link><span aria-hidden="true">/</span><button onClick={() => navigate()}>{course.title}</button><span className="course-account-badge">Saved to your account</span></div>
+      <LearningReveal key={(chapterId ?? 'overview') + ':' + (params.get('view') ?? '')}>
       {chapterId ? params.get('view') === 'practice' ? <TestResource key={'practice-' + chapterId} courseId={course.id} testId={chapterId} adaptive reloadCourse={reload} onBack={() => navigate(chapterId)} />
         : testing ? <TestLoader key={chapterId} course={course} testId={chapterId} reloadCourse={reload} onBack={() => navigate(chapterId === 'final' ? undefined : chapterId)} />
         : <LessonLoader key={chapterId} course={course} chapterId={chapterId} onTest={() => navigate(chapterId, true)} reloadCourse={reload} />
@@ -100,14 +108,16 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
           <p className="course-eyebrow">Your learning path</p><h1>A little progress, every chapter.</h1>
           <p className="course-lead">{course.chapters.length} short lessons. Worked examples. A practice test for every chapter.</p>
           <div className="course-summary"><div><strong>{course.progress.read.length}</strong><span>lessons marked read</span></div><div><strong>{completed} / {course.chapters.length}</strong><span>chapter tests submitted</span></div><div><strong>{final.latest ? final.latest.percent + '%' : course.progress.finalUnlocked ? 'Unlocked' : 'Locked'}</strong><span>{final.latest ? 'final test · latest score' : 'final test'}</span></div></div>
-          <section className="course-panel"><h2>Learn → practise → review</h2><p>Read at your own pace, then take chapter practice. Review explanations after submission. Submit all {course.chapters.length} chapter tests to unlock the final. No minimum score required.</p><p>These original NCERT-aligned notes are starter material. Use each chapter’s textbook link for full treatment and exercises.</p><button className="course-button primary" onClick={() => navigate(course.chapters.find((c) => !testScores(course.progress.history, c.id).latest)?.id ?? course.chapters[0].id)}>Continue learning →</button></section>
+          <section className="course-panel course-continue"><p className="course-eyebrow">Your next chapter</p><h2>{course.chapters.find((c) => !testScores(course.progress.history, c.id).latest)?.title ?? 'Keep your knowledge fresh'}</h2><p>Read at your own pace. Work through an example, then put it into practice.</p><button className="course-button primary" onClick={() => navigate(course.chapters.find((c) => !testScores(course.progress.history, c.id).latest)?.id ?? course.chapters[0].id)}>Continue learning →</button><span className="course-orbit" aria-hidden="true">∑</span></section>
+          <section className="course-panel"><h2>Your chapters</h2><p className="course-muted">Learn → practise → review. Submit all {course.chapters.length} chapter tests to unlock the final. No minimum score required.</p><div className="course-chapter-list">{course.chapters.map((chapter, index) => <button className="course-chapter-row" key={chapter.id} onClick={() => navigate(chapter.id)}><span className="course-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{testScores(course.progress.history, chapter.id).latest ? '✓ Test submitted' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Ready to explore'}</small></span><span aria-hidden="true">↗</span></button>)}</div><p className="course-muted">Original NCERT-aligned starter notes. Each lesson links to the textbook for full treatment and exercises.</p></section>
           <section className="course-panel"><h2>Final course test</h2><p>{final.latest ? 'Final submitted. Latest ' + final.latest.percent + '% · Best ' + final.best + '%.' : course.progress.finalUnlocked ? 'All chapter tests submitted. Your final is ready.' : (course.chapters.length - completed) + ' chapter tests remain.'}</p><button className="course-button" onClick={() => navigate('final', true)}>{final.latest ? 'Review final test' : course.progress.finalUnlocked ? 'Open final test' : 'View remaining chapters'}</button></section>
-          <section className="course-panel"><h2>Reset test results</h2><p>Clear this course’s saved test drafts, attempts and scores. The final test will lock again. Your study level and read lessons are kept.</p>
+          <details className="course-panel course-management"><summary>Manage course results</summary><h2>Reset test results</h2><p>Clear this course’s saved test drafts, attempts and scores. The final test will lock again. Your study level and read lessons are kept.</p>
             {!resetConfirm ? <button className="course-button" onClick={() => setResetConfirm(true)}>Reset results…</button>
               : <div role="alertdialog" aria-modal="false" aria-labelledby="reset-title"><h3 id="reset-title">Clear all test results for {course.title}?</h3><p>This cannot be undone. Results from other courses are kept.</p><div className="course-actions"><button className="course-button" disabled={busy} onClick={() => setResetConfirm(false)}>Cancel reset</button><button className="course-button" disabled={busy} onClick={reset}>{busy ? 'Resetting…' : 'Confirm reset'}</button></div></div>}
             {error && <p role="alert" className="course-alert">{error}</p>}
-          </section>
+          </details>
         </>}
+      </LearningReveal>
     </main>
   </div>;
 }
@@ -124,10 +134,10 @@ function LessonLoader({ course, chapterId, onTest, reloadCourse }: { course: Cou
   }
   if (!lesson) return <><button className="course-text-button" onClick={reloadCourse}>Reload course</button><LoadingState error={error} retry={reload} /></>;
   const read = course.progress.read.includes(chapterId);
-  return <article>
+  return <LearningReveal><article className="course-lesson">
     <p className="course-eyebrow">{course.title} · Chapter {Number(chapterId.slice(3))}</p><h1>{lesson.title}</h1><p className="course-lead">{lesson.goal}</p>
     <a className="course-source" href={'https://ncert.nic.in/textbook/pdf/jemh1' + chapterId.slice(3) + '.pdf'} target="_blank" rel="noreferrer">Read the NCERT chapter ↗</a>
-    {lesson.contentVariant && <div className="course-panel">
+    {lesson.contentVariant && <div className="course-panel course-depth">
       <h2>Explanation depth: {lesson.contentVariant.servedTier === 'beginner' ? 'Beginner · more guidance' : lesson.contentVariant.servedTier === 'advanced' ? 'Advanced · deeper exploration' : 'Default · original lesson'}</h2>
       <p className="course-muted">{lesson.contentVariant.selection.reason === 'more-evidence-needed'
         ? 'Starting with the original lesson while we collect more answers across this chapter’s concepts.'
@@ -138,7 +148,7 @@ function LessonLoader({ course, chapterId, onTest, reloadCourse }: { course: Cou
     <div className="course-actions"><button className="course-button" disabled={read || busy} onClick={markRead}>{read ? '✓ Marked as read' : busy ? 'Saving…' : 'Mark as read'}</button><button className="course-button primary" onClick={onTest}>Open chapter practice →</button></div>
     <p className="course-muted">{lesson.questionCount} fixed questions · no time limit · explanations after submission.</p>
     {lesson.adaptiveAvailable && <Link className="course-button" to={'?chapter=' + chapterId + '&view=practice'}>Review concepts &amp; focused practice →</Link>}
-  </article>;
+  </article></LearningReveal>;
 }
 
 function TestLoader({ course, testId, reloadCourse, onBack }: { course: Course; testId: string; reloadCourse: () => void; onBack: () => void }) {
@@ -209,8 +219,8 @@ function TestView({ initial, courseId, onSubmitted, onBack, reload }: { initial:
     {adaptive && <p>Focused practice does not count as a chapter test or unlock the final. Difficulty stays within your saved education level.</p>}
     {adaptive && attempt?.selection && <div className="course-panel"><p>Focus: {attempt.selection.focusConcepts.join(', ')}</p><p>{Object.entries(attempt.selection.difficultyMix).map(([level, count]) => `${count} ${level}`).join(' · ')}</p><p>{attempt.selection.mode === 'revision' ? 'Revision set: these questions have been seen before and will not add fresh evidence.' : `${attempt.selection.freshCount} fresh questions. Previously seen questions are excluded.`}</p>{attempt.questions.length < 5 && <p>Shorter set: {attempt.questions.length} suitable questions available for this set.</p>}</div>}
     {error && <div className="course-alert" role="alert">{error}<button className="course-text-button" onClick={reload}>Reload saved test</button></div>}
-    {saved && <p role="status">{saved}</p>}
-    {insights && (!attempt || attempt.submittedAt) && <ConceptFeedback insights={insights} />}
+    {saved && <p className="course-save-status" role="status">✓ {saved}</p>}
+
     {!attempt ? <button className="course-button primary" disabled={busy} onClick={start}>{busy ? 'Starting…' : adaptive ? 'Start focused practice' : 'Start test'}</button>
       : attempt.submittedAt ? <>
         <div className="course-result" role="status"><strong>{attempt.correct} / {attempt.total} · {attempt.percent}%</strong><h2>{(attempt.percent ?? 0) >= 80 ? 'A strong start' : 'Keep building your understanding'}</h2><p>{adaptive ? 'Use the concept feedback to choose what to revise next.' : recommendation(attempt.percent ?? 0)}</p><p>This short test is a practice signal, not a complete measure of mastery.</p></div>
@@ -223,9 +233,9 @@ function TestView({ initial, courseId, onSubmitted, onBack, reload }: { initial:
         {attempt.questions.map((q, i) => <fieldset className="course-question" key={q.id} disabled={busy}><legend>{i + 1}. {q.prompt}</legend><p className="course-eyebrow">{q.concept} · {q.difficulty}</p>
           {q.options.map((option, index) => <label className={'course-option ' + (answers[q.id] === index ? 'selected' : '')} key={option}><input type="radio" name={q.id} value={index} checked={answers[q.id] === index} onChange={() => { setAnswers({ ...answers, [q.id]: index }); setSaved(''); }} /><span>{String.fromCharCode(65 + index)}. {option}</span></label>)}
         </fieldset>)}
-        <div className="course-actions"><span>{Object.keys(answers).length} / {attempt.questions.length} answered</span><button className="course-button" type="button" disabled={busy} onClick={() => void save(false)}>Save draft</button><button className="course-button primary" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Submit test'}</button></div>
-        {dirty && <p className="course-muted">Unsaved answer changes.</p>}
+        <div className="course-actions course-test-toolbar"><div><span>{Object.keys(answers).length} / {attempt.questions.length} answered</span><small>{dirty ? 'Unsaved changes' : 'Draft up to date'}</small></div><button className="course-button" type="button" disabled={busy} onClick={() => void save(false)}>Save draft</button><button className="course-button primary" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Submit test'}</button></div>
       </form>}
+    {insights && (!attempt || attempt.submittedAt) && <ConceptFeedback insights={insights} />}
     {history.length > 0 && <details className="course-panel"><summary>{adaptive ? 'Focused practice history' : 'Attempt history'} ({history.length})</summary><ol>{history.map((item) => <li key={item.id}>{new Date(item.submittedAt).toLocaleString()} · {item.percent}%{item.kind === 'adaptive' && item.selection && <> · {item.selection.focusConcepts.join(', ')} · {Object.entries(item.selection.difficultyMix).map(([level, count]) => `${count} ${level}`).join(', ')} · {item.selection.mode === 'revision' ? 'Repeated revision' : 'Fresh practice'}</>}</li>)}</ol></details>}
   </section>;
 }

@@ -13,11 +13,11 @@ export default function LessonContent({ lesson }: { lesson: Lesson }) {
   return <>
     <p className="course-muted">AI-adapted explanation · {variant?.verified ? 'Reviewed' : 'Not yet teacher-reviewed'} · About {Math.max(1, Math.ceil(words / 160))} min reading</p>
     <p className="course-lead">{generated.summary}</p>
-    <nav className="course-panel" aria-label="Lesson sections"><h2>In this lesson</h2><ol>{generated.sections.map((section, index) => <li key={index}><a href={'#lesson-section-' + index}>{section.title}</a></li>)}</ol></nav>
+    <nav className="course-panel course-lesson-nav" aria-label="Lesson sections"><h2>In this lesson</h2><ol>{generated.sections.map((section, index) => <li key={index}><a href={'#lesson-section-' + index}>{section.title}</a></li>)}</ol></nav>
     {generated.sections.map((section, index) => <section className="course-panel" id={'lesson-section-' + index} key={index}>
       <h2>{section.title}</h2>{section.explanation.map((paragraph, i) => <p key={i}>{paragraph}</p>)}
-      <h3>Worked example</h3><p>{section.example.problem}</p><ol>{section.example.steps.map((step, i) => <li key={i}>{step}</li>)}</ol>
-      <h3>Check yourself</h3><p>{section.checkYourself}</p>
+      <div className="course-example-inset"><h3>Worked example</h3><p>{section.example.problem}</p><ol>{section.example.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></div>
+      <div className="course-self-check"><h3>Check yourself</h3><p>{section.checkYourself}</p></div>
     </section>)}
     <section className="course-panel"><h2>Key takeaways</h2><ul>{generated.takeaways.map((text, i) => <li key={i}>{text}</li>)}</ul></section>
   </>;
