@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import MarkdownEditor from '../components/MarkdownEditor';
+import { WarpedGrid } from '../components/art';
 import {
   FolderIcon, FolderOpenIcon, FileTextIcon, SearchIcon,
   FilePlusIcon, FolderPlusIcon, ChevronRightIcon,
@@ -524,7 +525,7 @@ const Notes: React.FC = () => {
         <div className="sidebar-header">
           <div className="sidebar-brand">
             <h2>vCHITR</h2>
-            <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+            <div className="sidebar-brand-actions">
               <div className="sidebar-actions">
                 <button onClick={createNewNote} title="New Note">
                   {FilePlusIcon({ size: 16 })}
@@ -559,7 +560,7 @@ const Notes: React.FC = () => {
 
         <div className="sidebar-tree">
           {filteredNotes.length === 0 ? (
-            <div style={{ padding: '2rem 1.25rem', textAlign: 'center', opacity: 0.4, fontSize: '0.85rem' }}>
+            <div className="sidebar-empty">
               {search ? 'No matching notes found' : 'No notes yet'}
             </div>
           ) : (
@@ -686,7 +687,9 @@ const Notes: React.FC = () => {
             </div>
             <div className="notes-content-body">
               <div className="empty-state">
-                <div className="empty-state-icon">✎</div>
+                <div className="empty-state-icon" aria-hidden="true">
+                  <WarpedGrid className="ui-art--fill" warp="pinch" intensity={0.9} cols={20} rows={12} seed={9} />
+                </div>
                 <h3>Select a note</h3>
                 <p>Choose a note from the sidebar to start reading or editing. You can also create new notes and folders.</p>
               </div>

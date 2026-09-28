@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
+import './styles/chrome.css'
 import App from './App.tsx'
 
 // A data router enables navigation blocking (useBlocker) for unsaved test answers.

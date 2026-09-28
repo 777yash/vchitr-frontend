@@ -1,72 +1,184 @@
 .home-container {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  background-color: #050505;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 100dvh;
   overflow: hidden;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--c-bg);
+  color: var(--c-fg);
+}
+
+/* Blueprint grid, fading out toward the edges */
+.home-blueprint {
+  position: absolute;
+  inset: 0;
+  --grid-size: 32px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 45%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 70% at 70% 45%, #000 20%, transparent 75%);
+  pointer-events: none;
+}
+
+.home-poster {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding-top: 72px;
+  padding-bottom: var(--s-5);
+}
+
+/* Top strip: tiny poster chrome */
+.home-meta {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: var(--s-5);
+  padding-bottom: var(--s-3);
+  border-bottom: var(--hairline) solid var(--c-line-strong);
+}
+
+.home-meta-mid {
+  justify-self: end;
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(var(--s-6), 5vw, var(--s-9));
+  padding-block: clamp(var(--s-6), 6vh, var(--s-8));
 }
 
 .home-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  align-items: flex-start;
+  gap: var(--s-5);
 }
 
 .home-title {
-  font-size: 5rem;
-  font-weight: 800;
   margin: 0;
-  letter-spacing: -2px;
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 800;
+  font-size: clamp(5.5rem, 17vw, 14rem);
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  /* Brand casing stays as written. */
+  text-transform: none;
 }
 
 .home-subtitle {
-  font-size: 1.1rem;
-  color: #ccc;
   margin: 0;
+  max-width: 34ch;
+  font-size: var(--fs-body-sm);
+  line-height: 1.5;
+  color: var(--c-muted);
 }
 
 .home-buttons {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
 }
 
-.btn {
-  padding: 0.8rem 2.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+/* Art: a main figure with an overlapping inset, like the posters' stacked windows */
+.home-art {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 560px;
+  justify-self: end;
 }
 
-.btn-primary {
-  background-color: #fff;
-  color: #000;
-  border: 1px solid #fff;
+.home-window {
+  position: absolute;
+  background: var(--c-bg);
 }
 
-.btn-primary:hover {
-  background-color: #e0e0e0;
+.home-window--main {
+  inset: 0 12% 18% 0;
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+.home-window--inset {
+  right: 0;
+  bottom: 0;
+  width: 52%;
+  height: 40%;
 }
 
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: #fff;
+.home-window-art {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
 }
 
+.home-focus {
+  position: absolute;
+  left: 58%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  background: var(--c-bg);
+}
+
+.home-foot {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-5);
+  padding-top: var(--s-3);
+  border-top: var(--hairline) solid var(--c-line-strong);
+}
+
+/* Barcode-like tick rule */
+.home-ticks {
+  height: 10px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--c-line-strong) 0 var(--hairline),
+    transparent var(--hairline) 6px
+  );
+}
+
+@media (max-width: 900px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .home-art {
+    max-width: 440px;
+    justify-self: stretch;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-meta {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .home-meta-mid {
+    display: none;
+  }
+
+  .home-meta-globe {
+    justify-self: end;
+  }
+
+  .home-foot {
+    grid-template-columns: 1fr auto;
+  }
+
+  .home-foot .ui-caption:last-child {
+    display: none;
+  }
+
+  .home-buttons {
+    width: 100%;
+  }
+
+  .home-buttons .ui-btn {
+    flex: 1;
+  }
+}

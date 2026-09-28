@@ -1,8 +1,6 @@
 /* ===== Editor Container ===== */
 .md-editor {
-  --toolbar-bg: var(--bg-color);
-  --mode-toggle-bg: rgba(128, 128, 128, 0.1);
-  --codeblock-bg: var(--card-bg);
+  --toolbar-bg: var(--c-bg);
 
   display: flex;
   flex-direction: column;
@@ -10,16 +8,16 @@
   overflow: hidden;
   background-color: var(--notes-bg);
   color: var(--notes-text);
-  font-family: var(--ui-font);
+  font-family: var(--font-body);
 }
 
 /* ===== Toolbar ===== */
 .md-toolbar {
   display: flex;
   align-items: center;
-  gap: 0.15rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--sidebar-border);
+  gap: 2px;
+  padding: 6px var(--s-3);
+  border-bottom: var(--hairline) solid var(--sidebar-border);
   background-color: var(--toolbar-bg);
   flex-wrap: wrap;
   flex-shrink: 0;
@@ -28,74 +26,81 @@
 .md-toolbar-group {
   display: flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 2px;
 }
 
 .md-toolbar-divider {
-  width: 1px;
-  height: 22px;
+  width: var(--hairline);
+  height: 20px;
   background-color: var(--sidebar-border);
-  margin: 0 0.4rem;
+  margin: 0 var(--s-2);
   flex-shrink: 0;
 }
 
 .md-toolbar button {
   background: transparent;
-  border: 1px solid transparent;
+  border: var(--hairline) solid transparent;
   color: var(--notes-text);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  transition: all 0.15s ease;
+  font-size: var(--fs-small);
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
   flex-shrink: 0;
 }
 
 .md-toolbar button:hover {
-  background-color: var(--sidebar-hover);
-  border-color: var(--sidebar-border);
+  background-color: var(--c-accent);
+  color: var(--c-on-accent);
 }
 
 .md-toolbar button.active {
-  background-color: var(--sidebar-active);
-  border-color: var(--sidebar-border);
+  border-color: var(--c-fg);
 }
 
 .md-toolbar button[title]::after {
   content: none;
 }
 
-/* Mode toggle buttons */
+/* Mode toggle: a segmented hairline switch */
 .md-mode-toggle {
   display: flex;
   margin-left: auto;
-  background-color: var(--mode-toggle-bg);
-  border-radius: 8px;
-  padding: 0.15rem;
-  gap: 0.1rem;
+  border: var(--hairline) solid var(--c-line-strong);
 }
 
 .md-mode-toggle button {
-  font-size: 0.72rem;
-  font-weight: 550;
   width: auto;
-  padding: 0.3rem 0.7rem;
-  letter-spacing: 0.3px;
+  height: 30px;
+  padding: 0 var(--s-3);
+  gap: 6px;
+  border: 0;
+  border-right: var(--hairline) solid var(--c-line);
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
   white-space: nowrap;
-  gap: 0.3rem;
+}
+
+.md-mode-toggle button:last-child {
+  border-right: 0;
 }
 
 .md-mode-toggle button span {
   display: inline;
 }
 
-.md-mode-toggle button.active {
-  background-color: var(--sidebar-bg);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+.md-mode-toggle button.active,
+.md-mode-toggle button.active:hover {
+  background-color: var(--c-fg);
+  color: var(--c-bg);
+  border-color: var(--c-line);
 }
 
 /* ===== Editor Body ===== */
@@ -120,12 +125,13 @@
   padding: 1rem 0.5rem 1rem 0;
   text-align: right;
   line-height: 1.7;
-  color: var(--notes-text);
-  opacity: 0.25;
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
   user-select: none;
   overflow: hidden;
   background-color: transparent;
-  border-right: 1px solid var(--sidebar-border);
+  border-right: var(--hairline) solid var(--sidebar-border);
 }
 
 .md-editor-wrapper {
@@ -134,6 +140,7 @@
   overflow: hidden;
 }
 
+/* Keep padding and line-height identical to .md-highlight-overlay so the caret lines up. */
 .md-textarea {
   width: 100%;
   height: 100%;
@@ -152,21 +159,23 @@
 }
 
 .md-textarea::placeholder {
-  color: var(--notes-text);
-  opacity: 0.3;
+  color: var(--c-muted);
+  opacity: 1;
 }
 
-.md-textarea::-webkit-scrollbar {
+.md-textarea::-webkit-scrollbar,
+.md-preview-pane::-webkit-scrollbar {
   width: 6px;
 }
 
-.md-textarea::-webkit-scrollbar-track {
+.md-textarea::-webkit-scrollbar-track,
+.md-preview-pane::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.md-textarea::-webkit-scrollbar-thumb {
+.md-textarea::-webkit-scrollbar-thumb,
+.md-preview-pane::-webkit-scrollbar-thumb {
   background-color: var(--sidebar-border);
-  border-radius: 3px;
 }
 
 /* Syntax highlight overlay */
@@ -187,56 +196,44 @@
   color: var(--notes-text);
 }
 
-/* Highlight tokens */
+/* Highlight tokens: monochrome, differentiated by weight, style and one accent.
+   Colour only — no padding (it would shift glyphs off the caret) and no background
+   (the lightweight tokenizer can mark whole fenced blocks as inline code). */
 .md-highlight-overlay .md-h {
-  color: #8b5e3c;
+  color: var(--c-fg);
   font-weight: 700;
 }
 
 .md-highlight-overlay .md-bold {
-  color: #5d4037;
+  color: var(--c-fg);
   font-weight: 700;
 }
 
 .md-highlight-overlay .md-italic {
-  color: #6d4c41;
+  color: var(--c-fg);
   font-style: italic;
 }
 
 .md-highlight-overlay .md-code {
-  color: #c0392b;
-  background: rgba(192, 57, 43, 0.06);
-  border-radius: 3px;
-  padding: 0 2px;
+  color: var(--c-accent-text);
 }
 
 .md-highlight-overlay .md-link {
-  color: #2980b9;
+  color: var(--c-accent-text);
   text-decoration: underline;
+  text-decoration-thickness: var(--hairline);
 }
 
-.md-highlight-overlay .md-list {
-  color: #e67e22;
-}
-
-.md-highlight-overlay .md-blockquote {
-  color: #7f8c8d;
-}
-
-.md-highlight-overlay .md-hr {
-  color: #bdc3c7;
-}
-
-.md-highlight-overlay .md-img {
-  color: #27ae60;
-}
-
+.md-highlight-overlay .md-list,
+.md-highlight-overlay .md-blockquote,
+.md-highlight-overlay .md-hr,
+.md-highlight-overlay .md-img,
 .md-highlight-overlay .md-table-sep {
-  color: #95a5a6;
+  color: var(--c-muted);
 }
 
 .md-highlight-overlay .md-codeblock {
-  color: #8e44ad;
+  color: var(--c-accent-text);
 }
 
 /* ===== Preview Pane ===== */
@@ -246,22 +243,9 @@
   padding: 2rem 2.5rem;
 }
 
-.md-preview-pane::-webkit-scrollbar {
-  width: 6px;
-}
-
-.md-preview-pane::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.md-preview-pane::-webkit-scrollbar-thumb {
-  background-color: var(--sidebar-border);
-  border-radius: 3px;
-}
-
 /* Split mode divider */
 .md-split-divider {
-  width: 1px;
+  width: var(--hairline);
   background-color: var(--sidebar-border);
   flex-shrink: 0;
 }
@@ -281,50 +265,61 @@
 .md-preview-content h6 {
   font-family: inherit;
   margin: 1.5em 0 0.6em;
-  line-height: 1.3;
+  line-height: 1.25;
   color: var(--notes-text);
+  text-wrap: balance;
+}
+
+/* Top-level headings take the poster display face; user-chosen font carries the rest. */
+.md-preview-content h1,
+.md-preview-content h2 {
+  font-family: var(--font-display);
+  font-stretch: var(--wdth-display);
+  font-weight: var(--wght-display);
+  line-height: 0.95;
+  letter-spacing: var(--track-display);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  border-bottom: var(--hairline) solid var(--sidebar-border);
 }
 
 .md-preview-content h1 {
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  padding-bottom: 0.4em;
-  border-bottom: 1px solid var(--sidebar-border);
+  font-size: 2.6rem;
+  padding-bottom: 0.3em;
 }
 
 .md-preview-content h2 {
-  font-size: 1.7rem;
-  font-weight: 600;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid var(--sidebar-border);
+  font-size: 1.8rem;
+  padding-bottom: 0.25em;
 }
 
 .md-preview-content h3 {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
 .md-preview-content h4 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
-.md-preview-content h5 {
-  font-size: 1rem;
+.md-preview-content h5,
+.md-preview-content h6 {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
   font-weight: 600;
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
 }
 
 .md-preview-content h6 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  opacity: 0.7;
+  color: var(--c-muted);
 }
 
 .md-preview-content p {
   margin: 0 0 1em;
-  line-height: 1.8;
-  font-size: 0.95rem;
+  line-height: 1.75;
+  font-size: 1em;
 }
 
 .md-preview-content strong {
@@ -336,52 +331,117 @@
 }
 
 .md-preview-content a {
-  color: #8b5e3c;
+  color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(139, 94, 60, 0.3);
-  text-underline-offset: 2px;
-  transition: text-decoration-color 0.2s ease;
+  text-decoration-thickness: var(--hairline);
+  text-underline-offset: 3px;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 
 .md-preview-content a:hover {
-  text-decoration-color: #8b5e3c;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
 }
 
-.md-preview-content code {
-  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
-  font-size: 0.85em;
-  background-color: rgba(139, 94, 60, 0.08);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  color: #c0392b;
+.md-preview-content :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border: var(--hairline) solid var(--c-line);
+  background-color: color-mix(in srgb, var(--c-accent) 30%, transparent);
+  color: var(--c-fg);
 }
 
+/* Code blocks are always an Ink panel so highlight colours read in both themes. */
 .md-preview-content pre {
-  margin: 1em 0;
-  border-radius: 10px;
+  margin: 1.25em 0;
   overflow-x: auto;
-  background-color: var(--codeblock-bg) !important;
-  border: 1px solid var(--sidebar-border);
+  background-color: var(--ink-bg) !important;
+  border: var(--hairline) solid var(--c-line-strong);
 }
 
-.md-preview-content pre code {
+.md-preview-content pre code,
+.md-preview-content pre code.hljs {
   display: block;
   padding: 1.25rem 1.5rem;
   background: transparent;
-  color: #e0d8d0;
+  color: var(--ink-fg);
+  font-family: var(--font-mono);
   font-size: 0.84rem;
   line-height: 1.65;
-  border-radius: 0;
+}
+
+.md-preview-content .hljs-keyword,
+.md-preview-content .hljs-selector-tag,
+.md-preview-content .hljs-built_in,
+.md-preview-content .hljs-literal,
+.md-preview-content .hljs-type,
+.md-preview-content .hljs-meta,
+.md-preview-content .hljs-tag {
+  color: var(--ink-accent);
+}
+
+.md-preview-content .hljs-string,
+.md-preview-content .hljs-regexp,
+.md-preview-content .hljs-char,
+.md-preview-content .hljs-addition,
+.md-preview-content .hljs-template-tag {
+  color: var(--ink-fg);
+}
+
+.md-preview-content .hljs-number,
+.md-preview-content .hljs-symbol,
+.md-preview-content .hljs-attr,
+.md-preview-content .hljs-attribute,
+.md-preview-content .hljs-variable,
+.md-preview-content .hljs-template-variable,
+.md-preview-content .hljs-params,
+.md-preview-content .hljs-property,
+.md-preview-content .hljs-operator,
+.md-preview-content .hljs-punctuation,
+.md-preview-content .hljs-selector-id,
+.md-preview-content .hljs-selector-class,
+.md-preview-content .hljs-selector-attr,
+.md-preview-content .hljs-selector-pseudo,
+.md-preview-content .hljs-subst,
+.md-preview-content .hljs-link,
+.md-preview-content .hljs-bullet {
+  color: var(--ink-soft);
+}
+
+.md-preview-content .hljs-title,
+.md-preview-content .hljs-section,
+.md-preview-content .hljs-name {
+  color: var(--ink-fg);
+  font-weight: 600;
+}
+
+.md-preview-content .hljs-comment,
+.md-preview-content .hljs-quote,
+.md-preview-content .hljs-doctag,
+.md-preview-content .hljs-formula {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.md-preview-content .hljs-deletion {
+  color: var(--ink-signal);
+}
+
+.md-preview-content .hljs-emphasis {
+  font-style: italic;
+}
+
+.md-preview-content .hljs-strong {
+  font-weight: 700;
 }
 
 .md-preview-content blockquote {
-  margin: 1em 0;
+  margin: 1.25em 0;
   padding: 0.75em 1.25em;
-  border-left: 3px solid #8b5e3c;
-  background-color: rgba(139, 94, 60, 0.04);
-  border-radius: 0 6px 6px 0;
+  border-left: 2px solid var(--c-fg);
+  background-color: var(--c-surface);
   color: var(--notes-text);
-  opacity: 0.85;
 }
 
 .md-preview-content blockquote p:last-child {
@@ -397,12 +457,17 @@
 .md-preview-content li {
   margin: 0.3em 0;
   line-height: 1.7;
-  font-size: 0.95rem;
+}
+
+.md-preview-content li::marker {
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
 }
 
 .md-preview-content hr {
   border: none;
-  height: 1px;
+  height: var(--hairline);
   background-color: var(--sidebar-border);
   margin: 2em 0;
 }
@@ -410,30 +475,32 @@
 .md-preview-content table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 0.9rem;
+  margin: 1.25em 0;
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
 }
 
 .md-preview-content th,
 .md-preview-content td {
   padding: 0.6em 1em;
-  border: 1px solid var(--sidebar-border);
+  border: var(--hairline) solid var(--sidebar-border);
   text-align: left;
 }
 
 .md-preview-content th {
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
   font-weight: 600;
-  background-color: rgba(139, 94, 60, 0.06);
-  font-family: var(--ui-mono);
-  font-size: 0.85rem;
-  letter-spacing: 0.3px;
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  background-color: var(--c-surface);
 }
 
 .md-preview-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
   margin: 1em 0;
+  border: var(--hairline) solid var(--c-line);
 }
 
 /* ===== Status Bar ===== */
@@ -441,21 +508,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.35rem 1rem;
-  border-top: 1px solid var(--sidebar-border);
+  min-height: 28px;
+  padding: 0 var(--s-4);
+  border-top: var(--hairline) solid var(--sidebar-border);
   background-color: var(--toolbar-bg);
-  font-size: 0.72rem;
-  color: var(--notes-text);
-  opacity: 0.6;
-  flex-shrink: 0;
-  letter-spacing: 0.3px;
+  color: var(--c-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--track-caption);
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .md-status-left,
 .md-status-right {
   display: flex;
-  gap: 1.25rem;
+  gap: var(--s-5);
   align-items: center;
 }
 
@@ -465,70 +535,16 @@
 
 .md-shortcut-hint {
   display: flex;
-  gap: 0.5rem;
+  gap: 6px;
   align-items: center;
 }
 
 .md-shortcut-hint kbd {
   font-family: inherit;
-  font-size: 0.68rem;
-  background: rgba(0, 0, 0, 0.06);
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-  border: 1px solid var(--sidebar-border);
-}
-
-/* Global theme handles the dark mode natively */
-
-[data-theme='dark'] .md-highlight-overlay .md-h {
-  color: #d4a574;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-bold {
-  color: #c9a87c;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-italic {
-  color: #bfa88e;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-code {
-  color: #e67e22;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-link {
-  color: #5dade2;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-list {
-  color: #f0b27a;
-}
-
-[data-theme='dark'] .md-highlight-overlay .md-blockquote {
-  color: #95a5a6;
-}
-
-[data-theme='dark'] .md-preview-content a {
-  color: #d4a574;
-  text-decoration-color: rgba(212, 165, 116, 0.3);
-}
-
-[data-theme='dark'] .md-preview-content a:hover {
-  text-decoration-color: #d4a574;
-}
-
-[data-theme='dark'] .md-preview-content code {
-  background-color: rgba(212, 165, 116, 0.1);
-  color: #e67e22;
-}
-
-[data-theme='dark'] .md-preview-content blockquote {
-  border-left-color: #d4a574;
-  background-color: rgba(212, 165, 116, 0.05);
-}
-
-[data-theme='dark'] .md-preview-content th {
-  background-color: rgba(212, 165, 116, 0.08);
+  font-size: var(--fs-micro);
+  padding: 1px 4px;
+  border: var(--hairline) solid var(--c-line-strong);
+  color: var(--c-fg);
 }
 
 /* ===== Dropdown Menus ===== */
@@ -540,17 +556,15 @@
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  background-color: var(--sidebar-bg);
-  border: 1px solid var(--sidebar-border);
-  border-radius: 10px;
-  padding: 0.3rem;
+  background-color: var(--c-bg);
+  border: var(--hairline) solid var(--c-line-strong);
+  padding: 0;
   min-width: 160px;
   max-width: 260px;
   width: max-content;
   overflow: visible;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  z-index: 100;
-  animation: dropdownIn 0.15s ease;
+  z-index: var(--z-sticky);
+  animation: dropdownIn var(--dur-fast) var(--ease);
 }
 
 @keyframes dropdownIn {
@@ -568,16 +582,17 @@
 .md-dropdown-item {
   display: block;
   width: 100%;
-  padding: 0.45rem 0.75rem;
+  padding: 8px var(--s-3);
   border: none;
+  border-bottom: var(--hairline) solid var(--c-line);
   background: transparent;
   color: var(--notes-text);
-  font-size: 0.82rem;
+  font-size: var(--fs-body-sm);
   font-family: inherit;
   cursor: pointer;
   text-align: left;
-  border-radius: 6px;
-  transition: background-color 0.12s ease;
+  border-radius: var(--radius);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 
 .md-dropdown-menu .md-dropdown-item {
@@ -586,41 +601,46 @@
   display: block;
   text-align: left;
   white-space: nowrap;
-  font-size: 0.82rem;
+  font-size: var(--fs-body-sm);
   justify-content: flex-start;
 }
 
+.md-dropdown-menu .md-dropdown-item:last-child {
+  border-bottom: 0;
+}
+
 .md-dropdown-item:hover {
-  background-color: var(--sidebar-hover);
+  background-color: var(--c-accent);
+  color: var(--c-on-accent);
 }
 
 .md-dropdown-item.selected {
-  background-color: var(--sidebar-active);
   font-weight: 600;
 }
 
 .md-dropdown-item.selected::before {
-  content: '✓ ';
-  font-weight: 700;
-  opacity: 0.6;
+  content: '\25A0\00a0';
+  font-size: 0.7em;
+  vertical-align: 0.1em;
 }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .md-toolbar {
-    padding: 0.35rem 0.5rem;
-    gap: 0.1rem;
+    padding: 4px var(--s-2);
+    gap: 1px;
   }
 
   .md-toolbar button {
     width: 28px;
     height: 28px;
-    font-size: 0.8rem;
   }
 
+  /* Re-assert auto width: the 28px icon-button rule above would clip the labels. */
   .md-mode-toggle button {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
+    width: auto;
+    height: 26px;
+    padding: 0 var(--s-2);
   }
 
   .md-preview-pane {
@@ -633,8 +653,7 @@
   }
 
   .md-status-bar {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0 var(--s-2);
   }
 
   .md-shortcut-hint {

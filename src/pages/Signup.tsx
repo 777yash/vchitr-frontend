@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signup, login, me } from '../api/auth';
 import { extractApiError } from '../api/client';
 import { getProfile } from '../api/profile';
+import { TopoWaves } from '../components/art';
 import './Auth.css';
 
 const Signup: React.FC = () => {
@@ -51,8 +52,12 @@ const Signup: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-stars"></div>
+      <TopoWaves variant="contour" className="auth-art ui-art--fill" lines={22} intensity={0.8} seed={11} />
       <div className="auth-card">
+        <div className="auth-card-bar" aria-hidden="true">
+          <span>Session / New account</span>
+          <span className="ui-window__controls">□ ✕</span>
+        </div>
         <h1 className="auth-title">Create your account</h1>
         <p className="auth-subtitle">Join vCHITR and start taking notes.</p>
 

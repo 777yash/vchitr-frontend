@@ -47,12 +47,12 @@ export default function RequireAuth() {
       <div className="auth-card">
         {current?.error ? (
           <>
-            <p role="alert">{current.error}</p>
-            <button className="btn btn-primary" onClick={() => setAttempt((n) => n + 1)}>
+            <p role="alert" className="auth-error">{current.error}</p>
+            <button className="ui-btn ui-btn--solid" onClick={() => setAttempt((n) => n + 1)}>
               Retry
             </button>
           </>
-        ) : <p role="status">Checking your session…</p>}
+        ) : <p role="status" className="ui-caption">Checking your session…</p>}
       </div>
     </div>
   );

@@ -1,42 +1,138 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Fonts are loaded once in index.html (Archivo, IBM Plex Sans/Serif/Mono). */
 
+/* ---------------------------------------------------------------
+   Design tokens — wireframe poster system
+   Light theme = "Paper" (lavender-grey), dark theme = "Ink".
+   --------------------------------------------------------------- */
 :root {
-  --ui-font: 'IBM Plex Sans', system-ui, sans-serif;
-  --ui-serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
-  --ui-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Type families */
+  --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
 
-  font-family: var(--ui-font);
-  line-height: 1.5;
+  /* Type scale: tiny chrome, readable body, huge display */
+  --fs-micro: 0.625rem;   /* 10px — decorative captions only */
+  --fs-caption: 0.6875rem; /* 11px — labels, nav, metadata */
+  --fs-small: 0.75rem;    /* 12px */
+  --fs-body-sm: 0.8125rem; /* 13px — marketing blurbs */
+  --fs-body: 0.9375rem;   /* 15px — UI body */
+  --fs-read: 1rem;        /* 16px — lessons, notes, questions */
+  --fs-h3: 1.25rem;
+  --fs-h2: clamp(1.5rem, 3.2vw, 2.25rem);
+  --fs-h1: clamp(2.25rem, 6vw, 4.5rem);
+  --fs-display: clamp(3.5rem, 12vw, 9rem);
+
+  --lh-display: 0.88;
+  --lh-tight: 1.2;
+  --lh-body: 1.55;
+  --track-display: -0.01em;
+  --track-caption: 0.08em;
+  --wdth-display: 68%;
+  --wght-display: 750;
+
+  /* Spacing (4px base) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* Geometry */
+  --radius: 0;
+  --hairline: 1px;
+  --measure: 65ch;
+  --container: 1320px;
+
+  /* Layering */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-overlay: 500;
+  --z-nav: 1000;
+  --z-modal: 1050;
+  --z-grain: 1100;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 200ms;
+  --dur-slow: 400ms;
+
+  /* Fixed Ink palette for surfaces that stay dark in both themes (code blocks, poster heroes) */
+  --ink-bg: #0b0b0d;
+  --ink-surface: #16161a;
+  --ink-fg: #ececf1;
+  --ink-soft: #b9b9c6;
+  --ink-muted: #8c8c99;
+  --ink-line: rgba(236, 236, 241, 0.22);
+  --ink-line-strong: rgba(236, 236, 241, 0.6);
+  --ink-accent: #c9c7dc;
+  --ink-signal: #d4726a;
+
+  /* Colour — Paper (light) */
+  --c-bg: #e2e2eb;
+  --c-surface: #e9e9f0;
+  --c-surface-2: #d7d7e2;
+  --c-fg: #0b0b0d;
+  --c-muted: #55555f;
+  --c-line: rgba(11, 11, 13, 0.28);
+  --c-line-strong: rgba(11, 11, 13, 0.7);
+  --c-accent: #bdbad8;
+  --c-on-accent: #0b0b0d;
+  --c-accent-text: #5b5880; /* accent hue dark enough for text on Paper */
+  --c-signal: #9e3b35;
+  --c-signal-bg: rgba(158, 59, 53, 0.1);
+  --c-focus: #0b0b0d;
+  --grain-opacity: 0.05;
+
+  /* Legacy aliases — keep existing component CSS working until migrated */
+  --ui-font: var(--font-body);
+  --ui-serif: var(--font-serif);
+  --ui-mono: var(--font-mono);
+  --bg-color: var(--c-bg);
+  --text-color: var(--c-fg);
+  --card-bg: var(--c-surface);
+  --border-color: var(--c-line-strong);
+  --card-text: var(--c-fg);
+  --input-border: var(--c-line-strong);
+  --btn-bg: var(--c-fg);
+  --btn-text: var(--c-bg);
+  --btn-hover: color-mix(in srgb, var(--c-fg) 82%, var(--c-bg));
+
+  font-family: var(--font-body);
+  line-height: var(--lh-body);
   font-weight: 400;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  --bg-color: #ffffff;
-  --text-color: #000000;
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --border-color: #000000;
-  --card-text: #000000;
-  --input-border: #cccccc;
-  --btn-bg: #000000;
-  --btn-text: #ffffff;
-  --btn-hover: #222222;
   color-scheme: light;
 }
 
+/* Colour — Ink (dark) */
 [data-theme='dark'] {
   color-scheme: dark;
-  --bg-color: #121212;
-  --text-color: #ffffff;
-  --card-bg: rgba(30, 30, 30, 0.9);
-  --border-color: #444444;
-  --card-text: #ffffff;
-  --input-border: #555555;
-  --btn-bg: #ffffff;
-  --btn-text: #000000;
-  --btn-hover: #e0e0e0;
+  --c-bg: #0b0b0d;
+  --c-surface: #121215;
+  --c-surface-2: #1a1a1f;
+  --c-fg: #ececf1;
+  --c-muted: #8c8c99;
+  --c-line: rgba(236, 236, 241, 0.22);
+  --c-line-strong: rgba(236, 236, 241, 0.6);
+  --c-accent: #c9c7dc;
+  --c-on-accent: #0b0b0d;
+  --c-accent-text: #c9c7dc;
+  --c-signal: #d4726a;
+  --c-signal-bg: rgba(212, 114, 106, 0.12);
+  --c-focus: #c9c7dc;
+  --grain-opacity: 0.07;
 }
 
 *,
@@ -56,11 +152,22 @@ body {
   margin: 0;
   padding: 0;
   min-width: 320px;
-  min-height: 100vh;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: var(--ui-font);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100dvh;
+  background-color: var(--c-bg);
+  color: var(--c-fg);
+  font-family: var(--font-body);
+  transition: background-color var(--dur-slow) var(--ease), color var(--dur-slow) var(--ease);
+}
+
+/* Mechanical grain over the whole document; never intercepts input. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 button,
@@ -71,6 +178,33 @@ select {
   font-family: inherit;
 }
 
+/* Thin hairline scrollbars everywhere (Firefox; WebKit rules live with each scroller). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-strong) transparent;
+}
+
+::selection {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+:focus-visible {
+  outline: var(--hairline) solid var(--c-focus);
+  outline-offset: 2px;
+}
+
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -8,6 +8,7 @@ import {
   getGoogleClientId,
   type GoogleCredentialResponse,
 } from '../api/google';
+import { TopoWaves } from '../components/art';
 import './Auth.css';
 
 const Login: React.FC = () => {
@@ -99,8 +100,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-stars"></div>
+      <TopoWaves variant="contour" className="auth-art ui-art--fill" lines={22} intensity={0.8} seed={4} />
       <div className="auth-card">
+        <div className="auth-card-bar" aria-hidden="true">
+          <span>Session / Log in</span>
+          <span className="ui-window__controls">□ ✕</span>
+        </div>
         <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">Log in to continue to vCHITR.</p>
 

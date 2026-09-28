@@ -5,13 +5,25 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vCHITR.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#e2e2eb" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <title>vchitr</title>
+  <script>
+    // Apply the saved theme before first paint so dark-mode users never see a light flash.
+    // Mirrors the initial state in components/Navigation.tsx.
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved === 'dark' || (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        if (dark) document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0b0b0d');
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>

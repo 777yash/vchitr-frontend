@@ -36,6 +36,7 @@ const Faq: React.FC = () => {
     >
       <div className="faq-card">
         <div className="faq-header">
+          <p className="ui-caption">[ Help ] Frequently asked</p>
           <h1 className="faq-title">FAQ</h1>
           <p className="faq-subtitle">Find answers to common questions about using vCHITR and managing your notes.</p>
         </div>
@@ -52,7 +53,7 @@ const Faq: React.FC = () => {
         <div className="faq-footer">
           <h2>Need more help?</h2>
           <p>Reach out to our support team anytime</p>
-          <button className="btn btn-outline-dark" onClick={() => navigate('/contact')}>
+          <button className="ui-btn ui-btn--solid ui-btn--lg" onClick={() => navigate('/contact')}>
             Contact
           </button>
         </div>

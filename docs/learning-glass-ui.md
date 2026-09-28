@@ -1,6 +1,8 @@
 # Learning surface refresh
 
-The learning subject selector, level selector, course workspace, lessons, practice, results and history share a monochrome frosted surface treatment. Home, FAQ, Contact, Profile, competitive mode and global navigation are unchanged. Education levels, grading, eligibility and persistence use the existing API contracts.
+> **Superseded (2026-09-29):** the frosted-glass surfaces described below were replaced by the wireframe poster system — see `docs/design-system.md`. Learning surfaces now use hairline frames, no blur, no shadows and no rounded corners. The motion, dialog, skeleton and data-contract notes below still apply.
+
+The learning subject selector, level selector, course workspace, lessons, practice, results and history originally shared a monochrome frosted surface treatment. Education levels, grading, eligibility and persistence use the existing API contracts.
 
 ## Performance choices
 

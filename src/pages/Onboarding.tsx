@@ -13,6 +13,7 @@ import {
   type ProfileOut,
 } from '../api/profile';
 import CountryCodeSelect from '../components/CountryCodeSelect';
+import { TopoWaves } from '../components/art';
 import './Auth.css';
 import './Onboarding.css';
 
@@ -143,8 +144,12 @@ const Onboarding: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-stars"></div>
+      <TopoWaves variant="contour" className="auth-art ui-art--fill" lines={22} intensity={0.8} seed={8} />
       <div className="auth-card onboarding-card">
+        <div className="auth-card-bar" aria-hidden="true">
+          <span>Profile / Setup 01</span>
+          <span className="ui-window__controls">□ ✕</span>
+        </div>
         <h1 className="auth-title">Tell us about you</h1>
         <p className="auth-subtitle">A few details to personalize your vCHITR space.</p>
 
@@ -217,7 +222,7 @@ const Onboarding: React.FC = () => {
                 value={dialCode}
                 onChange={setDialCode}
                 disabled={submitting}
-                variant="dark"
+                variant="profile"
                 aria-label="Country code"
               />
               <input

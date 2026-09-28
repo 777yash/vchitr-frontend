@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useSyncExternalStore } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { me, logout, getStoredUser, getToken } from '../api/auth';
 import { SESSION_CHANGED } from '../api/client';
+import { Globe } from './art';
 import './Navigation.css';
 
 interface CurrentUser {
@@ -241,7 +242,10 @@ const Navigation: React.FC = () => {
           ✕
         </button>
         <div className="navbar-container">
-          <Link to="/" className="navbar-logo" onClick={closeNav}>vCHITR</Link>
+          <Link to="/" className="navbar-logo" onClick={closeNav}>
+            <Globe size={16} className="navbar-logo-mark" />
+            vCHITR
+          </Link>
           <div className="navbar-links">
             <Link
               to="/subjects"
@@ -307,8 +311,13 @@ const Navigation: React.FC = () => {
                 </Link>
               </div>
             )}
-            <button onClick={toggleTheme} className="theme-toggle" aria-label="Toggle Theme">
-              {isDark ? '☀️' : '🌙'}
+            <button
+              onClick={toggleTheme}
+              className="theme-toggle"
+              aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              <span className="theme-toggle-glyph" aria-hidden="true" />
+              <span className="theme-toggle-label">{isDark ? 'Light' : 'Dark'}</span>
             </button>
           </div>
         </div>

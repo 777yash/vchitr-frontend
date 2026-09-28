@@ -31,11 +31,11 @@ const Contact: React.FC = () => {
             </div>
 
             <div className="form-checkbox">
-              <input type="checkbox" id="privacy" name="privacy" />
+              <input type="checkbox" id="privacy" name="privacy" className="ui-check" />
               <label htmlFor="privacy">I agree to the privacy policy</label>
             </div>
 
-            <button type="submit" className="btn btn-dark">
+            <button type="submit" className="ui-btn ui-btn--solid ui-btn--lg">
               Send
             </button>
           </form>

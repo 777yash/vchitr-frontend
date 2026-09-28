@@ -6,7 +6,7 @@ interface IconProps {
   className?: string;
 }
 
-const defaultProps: IconProps = { size: 18, strokeWidth: 1.8 };
+const defaultProps: IconProps = { size: 18, strokeWidth: 1.5 };
 
 const svgBase = (props: IconProps, children: React.ReactNode) => (
   <svg
@@ -17,8 +17,8 @@ const svgBase = (props: IconProps, children: React.ReactNode) => (
     fill="none"
     stroke="currentColor"
     strokeWidth={props.strokeWidth || defaultProps.strokeWidth}
-    strokeLinecap="round"
-    strokeLinejoin="round"
+    strokeLinecap="square"
+    strokeLinejoin="miter"
     className={props.className}
   >
     {children}
@@ -57,10 +57,10 @@ export const ChevronDownIcon = (props: IconProps = {}) =>
   svgBase({ ...props, size: props.size || 14 }, <><path d="m6 9 6 6 6-6" /></>);
 
 export const PanelLeftCloseIcon = (props: IconProps = {}) =>
-  svgBase(props, <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /><path d="m16 15-3-3 3-3" /></>);
+  svgBase(props, <><rect width="18" height="18" x="3" y="3" /><path d="M9 3v18" /><path d="m16 15-3-3 3-3" /></>);
 
 export const PanelLeftOpenIcon = (props: IconProps = {}) =>
-  svgBase(props, <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /><path d="m14 9 3 3-3 3" /></>);
+  svgBase(props, <><rect width="18" height="18" x="3" y="3" /><path d="M9 3v18" /><path d="m14 9 3 3-3 3" /></>);
 
 export const MenuIcon = (props: IconProps = {}) =>
   svgBase(props, <><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></>);
@@ -112,19 +112,19 @@ export const LinkIcon = (props: IconProps = {}) =>
   svgBase(props, <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></>);
 
 export const ImageIcon = (props: IconProps = {}) =>
-  svgBase(props, <><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>);
+  svgBase(props, <><rect width="18" height="18" x="3" y="3" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>);
 
 export const MinusIcon = (props: IconProps = {}) =>
   svgBase(props, <><path d="M5 12h14" /></>);
 
 export const TableIcon = (props: IconProps = {}) =>
-  svgBase(props, <><path d="M12 3v18" /><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M3 9h18" /><path d="M3 15h18" /></>);
+  svgBase(props, <><path d="M12 3v18" /><rect width="18" height="18" x="3" y="3" /><path d="M3 9h18" /><path d="M3 15h18" /></>);
 
 export const EditIcon = (props: IconProps = {}) =>
   svgBase(props, <><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" /></>);
 
 export const SplitIcon = (props: IconProps = {}) =>
-  svgBase(props, <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M12 3v18" /></>);
+  svgBase(props, <><rect width="18" height="18" x="3" y="3" /><path d="M12 3v18" /></>);
 
 export const EyeIcon = (props: IconProps = {}) =>
   svgBase(props, <><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></>);
