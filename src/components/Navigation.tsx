@@ -55,6 +55,8 @@ const Navigation: React.FC = () => {
   // Sync theme attribute with state
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    const background = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', background);
   }, [isDark]);
 
   useEffect(() => {

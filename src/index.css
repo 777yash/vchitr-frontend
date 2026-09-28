@@ -23,9 +23,11 @@
   --btn-bg: #000000;
   --btn-text: #ffffff;
   --btn-hover: #222222;
+  color-scheme: light;
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
   --bg-color: #121212;
   --text-color: #ffffff;
   --card-bg: rgba(30, 30, 30, 0.9);
