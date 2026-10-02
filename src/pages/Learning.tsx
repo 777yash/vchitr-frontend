@@ -7,7 +7,9 @@ import { recommendation, testScores } from '../learning/progress';
 import type { Attempt, Course, Lesson, SubjectPreference, Test } from '../learning/course';
 import './LearningCourse.css';
 import ConceptFeedback from '../components/ConceptFeedback';
-import LessonContent from '../components/LessonContent';
+import ReadingLesson from '../components/ReadingLesson';
+import ChapterTutor from '../components/ChapterTutor';
+import { useActiveTime } from '../learning/useActiveTime';
 import LearningReveal from '../components/LearningReveal';
 import LearningSkeleton from '../components/LearningSkeleton';
 
@@ -104,6 +106,7 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
       <p className="course-eyebrow">Your saved course</p>
       <Link className="course-overview-link" to={courseHref()}>{course.title}</Link>
       <p>{completed} / {course.chapters.length} chapter tests submitted</p>
+      {course.aptitude && <><p>Learning tier: <strong>{course.aptitude.tier}</strong></p><progress value={course.aptitude.progress} max={100} aria-label="Progress toward next learning tier" /><p>{course.aptitude.reason === 'more-evidence-needed' ? 'Default while gathering enough reliable evidence.' : course.aptitude.progress + '% toward ' + (course.aptitude.tier === 'advanced' ? 'mastery' : 'next tier')}</p></>}
       <progress value={completed} max={course.chapters.length} aria-label="Chapter tests submitted" />
       <nav>{course.chapters.map((chapter, i) => {
         const scores = testScores(course.progress.history, chapter.id);
@@ -113,6 +116,7 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
       })}</nav>
       <Link className="course-button" to={courseHref('final', 'test')}>Final test {course.progress.finalUnlocked ? '→' : '· Locked'}</Link>
       <Link className="course-profile-link" to="/profile">Change level in Profile ↗</Link>
+      <Link className="course-profile-link" to="/notes">Notes vault ↗</Link>
   </>;
   return <div className="course-layout learning-surface">
     <a className="course-button course-skip-link" href="#course-main">Skip to lesson</a>
@@ -124,12 +128,13 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
     <main className="course-main" id="course-main" tabIndex={-1} ref={main}>
       <div className="course-workspace-header"><nav aria-label="Breadcrumb"><Link to="/subjects/learning">Learning</Link><span aria-hidden="true">/</span><Link to={courseHref()}>{course.title}</Link></nav><span className="course-account-badge">Saved to your account</span></div>
       <LearningReveal key={viewKey}>
-      {chapterId ? params.get('view') === 'practice' ? <TestResource key={'practice-' + chapterId} courseId={course.id} testId={chapterId} adaptive reloadCourse={reload} backTo={courseHref(chapterId)} />
+      {chapterId ? params.get('view') === 'practice' ? <TestResource key={'practice-' + chapterId} courseId={course.id} testId={chapterId} adaptive engagementEnabled={course.engagementEnabled} reloadCourse={reload} backTo={courseHref(chapterId)} />
         : testing ? <TestLoader key={chapterId} course={course} testId={chapterId} reloadCourse={reload} backTo={courseHref(chapterId === 'final' ? undefined : chapterId)} />
         : <LessonLoader key={chapterId} course={course} chapterId={chapterId} reloadCourse={reload} />
         : <>
           <p className="course-eyebrow">Your learning path</p><h1>A little progress, every chapter.</h1>
           <p className="course-lead">{course.chapters.length} short lessons. Worked examples. A practice test for every chapter.</p>
+          {course.aptitude && <section className="course-panel"><h2>Your learning tier: {course.aptitude.tier}</h2><p>{course.aptitude.reason === 'more-evidence-needed' ? 'More reliable evidence is needed before adjusting your tier.' : 'Tier reflects test performance, consistency, reading engagement and tutor feedback.'}</p><p className="course-muted">{course.aptitude.evidenceCount} evidence points · Confidence {percent(course.aptitude.confidence * 100)}. Education level stays unchanged. Tiers are recalculated after assessments and nightly; they are practice guidance, not a diagnosis of ability.</p><details><summary>How this score is calculated</summary><ul>{Object.entries(course.aptitude.signals).map(([signal, value]) => <li key={signal}>{signal.replace(/([A-Z])/g, ' $1')}: {percent(value * 100)}</li>)}</ul></details></section>}
           <div className="course-summary"><div><strong>{course.progress.read.length}</strong><span>lessons marked read</span></div><div><strong>{completed} / {course.chapters.length}</strong><span>chapter tests submitted</span></div><div><strong>{final.latest ? percent(final.latest.percent) : course.progress.finalUnlocked ? 'Unlocked' : 'Locked'}</strong><span>{final.latest ? 'final test · latest score' : 'final test'}</span></div></div>
           <section className="course-panel course-continue"><p className="course-eyebrow">Your next chapter</p><h2>{nextChapter?.title ?? 'Keep your knowledge fresh'}</h2><p>Read at your own pace. Work through an example, then put it into practice.</p><Link className="course-button primary" to={courseHref((nextChapter ?? course.chapters[0]).id)}>Continue learning →</Link><span className="course-orbit" aria-hidden="true">∑</span></section>
           <section className="course-panel"><h2>Your chapters</h2><p className="course-muted">Learn → practise → review. Submit all {course.chapters.length} chapter tests to unlock the final. No minimum score required.</p><div className="course-chapter-list">{course.chapters.map((chapter, index) => <Link className="course-chapter-row" key={chapter.id} to={courseHref(chapter.id)}><span className="course-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{testScores(course.progress.history, chapter.id).latest ? '✓ Test submitted' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Ready to explore'}</small></span><span aria-hidden="true">↗</span></Link>)}</div><p className="course-muted">Original NCERT-aligned starter notes. Each lesson links to the textbook for full treatment and exercises.</p></section>
@@ -164,13 +169,14 @@ function LessonLoader({ course, chapterId, reloadCourse }: { course: Course; cha
       <h2>Explanation depth: {lesson.contentVariant.servedTier === 'beginner' ? 'Beginner · more guidance' : lesson.contentVariant.servedTier === 'advanced' ? 'Advanced · deeper exploration' : 'Default · original lesson'}</h2>
       <p className="course-muted">{lesson.contentVariant.selection.reason === 'more-evidence-needed'
         ? 'Starting with the original lesson while we collect more answers across this chapter’s concepts.'
-        : 'Selected from your recent first answers to distinct chapter questions. Repeating questions does not add evidence.'} Your saved education level stays unchanged.</p>
+        : lesson.contentVariant.selection.reason === 'five-signals' ? 'Selected from your course aptitude profile: assessments, study consistency, reading engagement and tutor feedback.' : 'Selected from your recent first answers to distinct chapter questions. Repeating questions does not add evidence.'} Your saved education level stays unchanged.</p>
     </div>}
-    <LessonContent lesson={lesson} />
+    <ReadingLesson lesson={lesson} courseId={course.id} testTo={courseHref(chapterId, 'test')} />
     {saveError && <p role="alert" className="course-alert">{saveError}</p>}
     <div className="course-actions"><button className="course-button" disabled={read || busy} onClick={markRead}>{read ? '✓ Marked as read' : busy ? 'Saving…' : 'Mark as read'}</button><Link className="course-button primary" to={courseHref(chapterId, 'test')}>Open chapter practice →</Link></div>
     <p className="course-muted">{lesson.questionCount} fixed questions · no time limit · explanations after submission.</p>
     {lesson.adaptiveAvailable && <Link className="course-button" to={courseHref(chapterId, 'practice')}>Review concepts &amp; focused practice →</Link>}
+    {course.engagementEnabled && <ChapterTutor key={chapterId} courseId={course.id} chapterId={chapterId} />}
   </article></LearningReveal>;
 }
 
@@ -180,16 +186,16 @@ function TestLoader({ course, testId, reloadCourse, backTo }: { course: Course; 
     <ul>{course.chapters.filter((c) => !testScores(course.progress.history, c.id).latest).map((c) => <li key={c.id}><Link to={courseHref(c.id, 'test')}>{c.title} · test pending</Link></li>)}</ul>
     <button className="course-button" onClick={reloadCourse}>Refresh eligibility</button>
   </section>;
-  return <TestResource courseId={course.id} testId={testId} reloadCourse={reloadCourse} backTo={backTo} />;
+  return <TestResource courseId={course.id} testId={testId} engagementEnabled={course.engagementEnabled} reloadCourse={reloadCourse} backTo={backTo} />;
 }
 
-function TestResource({ courseId, testId, reloadCourse, backTo, adaptive = false }: { courseId: string; testId: string; reloadCourse: () => void; backTo: To; adaptive?: boolean }) {
+function TestResource({ courseId, testId, reloadCourse, backTo, adaptive = false, engagementEnabled }: { courseId: string; testId: string; reloadCourse: () => void; backTo: To; adaptive?: boolean; engagementEnabled?: boolean }) {
   const { data, error, reload } = useLearningResource<Test>('/courses/' + courseId + (adaptive ? '/chapters/' + testId + '/practice' : '/tests/' + testId));
-  return data ? <TestView key={data.attempt?.id ?? 'new'} initial={data} courseId={courseId} onSubmitted={reloadCourse} backTo={backTo} reload={reload} />
+  return data ? <TestView key={data.attempt?.id ?? 'new'} initial={data} courseId={courseId} engagementEnabled={engagementEnabled} onSubmitted={reloadCourse} backTo={backTo} reload={reload} />
     : <><Link className="course-text-button" to={backTo}>← Back to course</Link><LoadingState error={error} retry={reload} /></>;
 }
 
-function TestView({ initial, courseId, onSubmitted, backTo, reload }: { initial: Test; courseId: string; onSubmitted: () => void; backTo: To; reload: () => void }) {
+function TestView({ initial, courseId, onSubmitted, backTo, reload, engagementEnabled }: { initial: Test; courseId: string; onSubmitted: () => void; backTo: To; reload: () => void; engagementEnabled?: boolean }) {
   const [attempt, setAttempt] = useState(initial.attempt);
   const [answers, setAnswers] = useState(initial.attempt?.answers ?? {});
   const [pending, setPending] = useState<'start' | 'draft' | 'submit' | null>(null);
@@ -198,6 +204,8 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload }: { initial:
   const [saved, setSaved] = useState('');
   const [history, setHistory] = useState(initial.history);
   const [insights, setInsights] = useState(initial.insights);
+  const timingRoot = useRef<HTMLElement>(null);
+  const timing = useActiveTime(timingRoot, engagementEnabled && attempt && !attempt.submittedAt ? '/learning/courses/' + courseId + '/attempts/' + attempt.id + '/timing' : null, attempt?.id ?? '');
   const adaptive = initial.kind === 'adaptive';
   const dirty = !!attempt && !attempt.submittedAt && JSON.stringify(answers) !== JSON.stringify(attempt.answers);
   useEffect(() => {
@@ -244,7 +252,7 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload }: { initial:
   const scores = testScores(history, initial.testId);
   const answering = !!attempt && !attempt.submittedAt;
   const errorAlert = error && <div className="course-alert" role="alert">{error}<button className="course-text-button" onClick={reload}>Reload saved test</button></div>;
-  return <section>
+  return <section ref={timingRoot}>
     <Link className="course-text-button" to={backTo}>← {initial.testId === 'final' ? 'Course overview' : 'Study material'}</Link>
     <p className="course-eyebrow">{adaptive ? 'Practice selected from your recent answers' : initial.testId === 'final' ? 'One question from every chapter' : 'Chapter practice'}</p><h1>{initial.title}</h1>
     <p>{attempt?.questions.length ?? initial.questionCount} {adaptive && !attempt ? 'questions requested' : 'questions'} · 1 point each · no negative marking · no time limit</p>
@@ -253,6 +261,7 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload }: { initial:
     {adaptive && attempt?.selection && <div className="course-panel"><p>Focus: {attempt.selection.focusConcepts.join(', ')}</p><p>{Object.entries(attempt.selection.difficultyMix).map(([level, count]) => `${count} ${level}`).join(' · ')}</p><p>{attempt.selection.mode === 'revision' ? 'Revision set: these questions have been seen before and will not add fresh evidence.' : `${attempt.selection.freshCount} fresh questions. Previously seen questions are excluded.`}</p>{attempt.questions.length < 5 && <p>Shorter set: {attempt.questions.length} suitable questions available for this set.</p>}</div>}
     {!answering && errorAlert}
     {saved && <p className="course-save-status" role="status">✓ {saved}</p>}
+    {timing.error && <p className="course-muted" role="status">Question timing could not save. Your answers can still be submitted.</p>}
 
     {!attempt ? <button className="course-button primary" disabled={busy} onClick={start}>{pending === 'start' ? 'Starting…' : adaptive ? 'Start focused practice' : 'Start test'}</button>
       : attempt.submittedAt ? <>
@@ -263,7 +272,7 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload }: { initial:
         {attempt.questions.map((q, i) => <article className="course-panel" key={q.id}><p className="course-eyebrow">{q.concept} · {attempt.answers[q.id] === q.answer ? 'Correct' : 'Review this concept'}</p><h2>{i + 1}. {q.prompt}</h2><p>Your answer: {attempt.answers[q.id] === undefined ? 'Not answered' : q.options[attempt.answers[q.id]]}</p>{q.answer !== undefined && <p><strong>Correct answer: {q.options[q.answer]}</strong></p>}<p>{q.explanation}</p></article>)}
       </> : <form onSubmit={(e) => { e.preventDefault(); void save(true); }}>
         <p className="course-muted">Save your draft before leaving to resume on any device. Submission saves all answers.</p>
-        {attempt.questions.map((q, i) => <fieldset className="course-question" key={q.id} disabled={busy}><legend>{i + 1}. {q.prompt}</legend><p className="course-eyebrow">{q.concept} · {q.difficulty}</p>
+        {attempt.questions.map((q, i) => <fieldset className="course-question" data-time-id={q.id} key={q.id} disabled={busy}><legend>{i + 1}. {q.prompt}</legend><p className="course-eyebrow">{q.concept} · {q.difficulty}</p>
           {q.options.map((option, index) => <label className={'course-option ' + (answers[q.id] === index ? 'selected' : '')} key={option}><input type="radio" name={q.id} value={index} checked={answers[q.id] === index} onChange={() => { setAnswers({ ...answers, [q.id]: index }); setSaved(''); }} /><span>{String.fromCharCode(65 + index)}. {option}</span></label>)}
         </fieldset>)}
         {errorAlert}

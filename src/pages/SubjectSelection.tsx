@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getSubModules } from '../api/modules';
 import type { SubModule } from '../api/modules';
 import { extractApiError } from '../api/client';
+import { api } from '../api/client';
 import './SubjectSelection.css';
 import './LearningCourse.css';
 import LearningReveal from '../components/LearningReveal';
@@ -13,6 +14,8 @@ const SubjectSelection: React.FC = () => {
   const isLearning = mode === 'learning';
 
   const [subjects, setSubjects] = useState<SubModule[]>([]);
+  const [available, setAvailable] = useState<{ id: string; name: string; description: string }[]>([]);
+  const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -20,7 +23,12 @@ const SubjectSelection: React.FC = () => {
   useEffect(() => {
     if (!isLearning) return;
     let cancelled = false;
-    getSubModules()
+    api.get<{ id: string; name: string; description: string; enrolled: boolean }[]>('/learning/subjects')
+      .then(({ data }) => {
+        if (!cancelled) setAvailable(data.filter(item => !item.enrolled));
+        return data.filter(item => item.enrolled).map(item => ({ sub_module_id: item.id, sub_module_name: item.name, sub_module_description: item.description, created_at: '' }));
+      })
+      .catch(err => { if ([404, 503].includes(err.response?.status) && /not enabled|Not Found/i.test(String(err.response?.data?.detail))) return getSubModules(); throw err; })
       .then((data) => {
         if (!cancelled) { setSubjects(data); setError(''); }
       })
@@ -30,6 +38,13 @@ const SubjectSelection: React.FC = () => {
   }, [isLearning, attempt]);
 
   function retry() { setLoading(true); setError(''); setAttempt((value) => value + 1); }
+
+  async function enroll(id: string) {
+    setBusy(true); setError('');
+    try { await api.post('/learning/subjects/' + id + '/enroll'); retry(); }
+    catch (err) { setError(extractApiError(err)); }
+    finally { setBusy(false); }
+  }
 
   if (!isLearning) {
     return (
@@ -64,8 +79,9 @@ const SubjectSelection: React.FC = () => {
         </div>
       )}
       {!loading && !error && subjects.length === 0 && (
-        <p className="subsel-status">No subjects found.</p>
+        <p className="subsel-status">No enrolled subjects yet. Choose an available subject below.</p>
       )}
+      {available.length > 0 && <section><h2>Available subjects</h2><div className="subsel-grid">{available.map(subject => <article className="subsel-card" key={subject.id}><h3>{subject.name}</h3><p>{subject.description}</p><button className="course-button" disabled={busy} onClick={() => void enroll(subject.id)}>Enroll →</button></article>)}</div></section>}
 
       {!loading && !error && subjects.length > 0 && (
         <LearningReveal className="subsel-grid">
