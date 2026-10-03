@@ -15,7 +15,7 @@ export default function ReadingLesson({ lesson, courseId, testTo }: { lesson: Le
     {progress && <section className="course-panel" aria-label="Reading progress">
       <p>About {progress.estimatedMinutes} min reading · {progress.percent}% read</p>
       <progress value={progress.percent} max={100} aria-label="Chapter reading progress" />
-      <p className="course-muted">Progress counts sections viewed for at least 3 active seconds. Hidden or idle tabs do not count. Saves periodically.</p>
+      <p className="course-muted">Saved while you read. Idle tabs do not count.</p>
       {!lesson.contentVariant?.generated && <nav aria-label="Lesson sections">{progress.sections.map(section => <p key={section.id}><a href={'#reading-' + section.id}>{section.title}</a></p>)}</nav>}
     </section>}
     {tracking.error && <p className="course-alert" role="status">Reading progress could not save: {tracking.error} Temporary failures retry automatically; reload if the lesson changed.</p>}

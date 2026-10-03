@@ -5,11 +5,19 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vCHITR.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#050505" />
+  <style>html[data-theme='dark'] { background:#050505; color-scheme:dark; }</style>
+  <script>
+    // Apply the saved theme before paint so routes start with the same palette.
+    let theme = 'dark';
+    try { if (localStorage.getItem('theme') === 'light') theme = 'light'; } catch { /* Keep the default when storage is unavailable. */ }
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#ffffff' : '#050505';
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
     rel="stylesheet" />
   <title>vchitr</title>
 </head>

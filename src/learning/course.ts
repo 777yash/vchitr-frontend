@@ -4,7 +4,7 @@ export interface SubjectPreference {
   courseId: string | null; levels: StudyLevel[];
   course?: Course | null;
 }
-export interface ChapterSummary { id: string; title: string }
+export interface ChapterSummary { id: string; title: string; readingState?: 'not-started' | 'in-progress' | 'completed' }
 export interface ReadingProgress {
   sourceKey: string; sections: { id: string; title: string }[]; estimatedMinutes: number;
   seconds: Record<string, number>; percent: number; testReady: boolean; threshold: number;
@@ -19,7 +19,7 @@ export interface Lesson extends ChapterSummary {
   readingProgress?: ReadingProgress | null;
   goal: string; concepts: string[]; example: { problem: string; steps: string[] };
   watchFor: string; questionCount: number; adaptiveAvailable?: boolean;
-  contentVariant?: { requestedTier: ExplanationTier; servedTier: ExplanationTier; status: 'base' | 'ready' | 'unavailable'; generationId: string | null; verified: boolean; generated: GeneratedLesson | null;
+  contentVariant?: { requestedTier: ExplanationTier; servedTier: ExplanationTier; status: 'base' | 'ready' | 'unavailable'; generationId: string | null; verified: boolean; generated: GeneratedLesson | null; automaticGenerationEnabled?: boolean;
     selection: { tier: ExplanationTier; evidenceCount: number; percent: number | null; reason: 'more-evidence-needed' | 'chapter-results' | 'five-signals' } } | null;
 }
 export interface Question {
@@ -40,7 +40,7 @@ export interface Progress { read: string[]; history: AttemptSummary[]; finalUnlo
 export interface Aptitude { tier: ExplanationTier; score: number | null; confidence: number; evidenceCount: number; progress: number; reason: string; signals: Record<string, number> }
 export interface Course { id: string; title: string; chapters: ChapterSummary[]; progress: Progress; engagementEnabled?: boolean; aptitude?: Aptitude | null }
 export interface Test { testId: string; title: string; questionCount: number; attempt: Attempt | null; history: AttemptSummary[]; kind?: string; insights?: Insights; adaptiveAvailable?: boolean }
-export interface Selection { focusConcepts: string[]; difficultyMix: Record<string, number>; mode: 'fresh' | 'revision'; freshCount: number; repeatedQuestionIds: string[] }
+export interface Selection { focusConcepts: string[]; difficultyMix: Record<string, number>; mode: 'fresh' | 'revision'; freshCount: number; repeatedQuestionIds: string[]; tier?: ExplanationTier; policyVersion?: string; reason?: string }
 export interface ConceptInsight {
   id: string; title: string; explanation: string; example: { problem: string; steps: string[] };
   commonMistake: string; checklist: string[]; evidenceCount: number; correct: number; percent: number | null;

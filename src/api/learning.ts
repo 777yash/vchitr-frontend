@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api, extractApiError } from './client';
 import type { SubjectPreference } from '../learning/course';
 
 // No material or result cache: each resource opening requests the backend.
 export function useLearningResource<T>(path: string) {
   const [revision, setRevision] = useState(0);
+  const reload = useCallback(() => setRevision(value => value + 1), []);
   const requestKey = path + ':' + revision;
   const [state, setState] = useState<{ key: string; data?: T; error?: string }>({ key: '' });
   useEffect(() => {
@@ -16,7 +17,7 @@ export function useLearningResource<T>(path: string) {
   }, [path, requestKey]);
   return { data: state.key === requestKey ? state.data : undefined,
     error: state.key === requestKey ? state.error : undefined,
-    reload: () => setRevision((value) => value + 1) };
+    reload };
 }
 
 export async function saveLearningLevel(subjectId: string, level: string) {

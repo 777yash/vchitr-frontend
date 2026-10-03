@@ -8,6 +8,7 @@ import './SubjectSelection.css';
 import './LearningCourse.css';
 import LearningReveal from '../components/LearningReveal';
 import LearningSkeleton from '../components/LearningSkeleton';
+import StudyRoom from '../components/StudyRoom';
 
 const SubjectSelection: React.FC = () => {
   const { mode } = useParams<{ mode: string }>();
@@ -66,9 +67,8 @@ const SubjectSelection: React.FC = () => {
     <div className="subsel-container learning-surface learning-selection">
       <div className="subsel-header">
         <Link className="subsel-back" to="/">← Back</Link>
-        <p className="course-eyebrow">A little curiosity goes a long way</p>
-        <h1 className="subsel-title">Make room for discovery.</h1>
-        <p className="subsel-subtitle">Choose a subject. Find your pace. Build your understanding.</p>
+        <p className="course-eyebrow">Learning</p>
+        <h1 className="subsel-title">Your study rooms.</h1>
       </div>
 
       {loading && <LearningSkeleton />}
@@ -91,13 +91,11 @@ const SubjectSelection: React.FC = () => {
               className="subsel-card"
               to={`/learning/${encodeURIComponent(s.sub_module_name)}`}
             >
-              <span className="learning-subject-symbol" aria-hidden="true">{s.sub_module_name.toLowerCase().includes('math') ? '∑' : '↗'}</span>
-              <span className="course-eyebrow">Your next discovery</span>
+              <StudyRoom />
+              <span className="course-eyebrow">Your subject</span>
               <h2 className="subsel-name">{s.sub_module_name}</h2>
-              {s.sub_module_description && (
-                <p className="subsel-desc">{s.sub_module_description}</p>
-              )}
-              <span className="subsel-progress-label">Open learning →</span>
+              <p className="subsel-desc">{s.sub_module_name.toLowerCase().includes('math') ? 'Class 10 · NCERT · 14 chapters' : s.sub_module_description}</p>
+              <span className="subsel-progress-label">Continue learning <span aria-hidden="true">↗</span></span>
             </Link>
           ))}
         </LearningReveal>

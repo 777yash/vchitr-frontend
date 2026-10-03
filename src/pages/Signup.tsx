@@ -54,7 +54,7 @@ const Signup: React.FC = () => {
       <div className="auth-stars"></div>
       <div className="auth-card">
         <h1 className="auth-title">Create your account</h1>
-        <p className="auth-subtitle">Join vCHITR and start taking notes.</p>
+        <p className="auth-subtitle">Your progress, saved in one place.</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">

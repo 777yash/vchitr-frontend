@@ -146,7 +146,7 @@ const Onboarding: React.FC = () => {
       <div className="auth-stars"></div>
       <div className="auth-card onboarding-card">
         <h1 className="auth-title">Tell us about you</h1>
-        <p className="auth-subtitle">A few details to personalize your vCHITR space.</p>
+        <p className="auth-subtitle">Set up your profile.</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">

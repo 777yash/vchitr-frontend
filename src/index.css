@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-
 :root {
   --ui-font: 'IBM Plex Sans', system-ui, sans-serif;
-  --ui-serif: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
-  --ui-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ui-serif: var(--ui-font);
+  --ui-mono: ui-monospace, 'Cascadia Code', monospace;
 
   font-family: var(--ui-font);
   line-height: 1.5;
@@ -15,28 +13,43 @@
   -moz-osx-font-smoothing: grayscale;
 
   --bg-color: #ffffff;
-  --text-color: #000000;
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --border-color: #000000;
-  --card-text: #000000;
-  --input-border: #cccccc;
-  --btn-bg: #000000;
+  --text-color: #202020;
+  --surface-color: #fafafa;
+  --muted-color: #696969;
+  --accent-color: #ab7b49;
+  --card-bg: var(--surface-color);
+  --border-color: #dedede;
+  --card-border: var(--border-color);
+  --card-text: var(--text-color);
+  --input-border: var(--border-color);
+  --btn-bg: #202020;
   --btn-text: #ffffff;
   --btn-hover: #222222;
+  --art-line: #505050;
+  --art-floor: #e5e5e5;
+  --art-wall: #f2f2f2;
+  --art-accent: #cfaa71;
   color-scheme: light;
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
-  --bg-color: #121212;
-  --text-color: #ffffff;
-  --card-bg: rgba(30, 30, 30, 0.9);
-  --border-color: #444444;
-  --card-text: #ffffff;
-  --input-border: #555555;
-  --btn-bg: #ffffff;
-  --btn-text: #000000;
+  --bg-color: #050505;
+  --text-color: #f5f5f5;
+  --surface-color: #111112;
+  --muted-color: #a6a6a6;
+  --accent-color: #d4aa73;
+  --card-bg: var(--surface-color);
+  --border-color: #2d2d2d;
+  --card-text: var(--text-color);
+  --input-border: var(--border-color);
+  --btn-bg: #f5f5f5;
+  --btn-text: #111112;
   --btn-hover: #e0e0e0;
+  --art-line: #aaaaaa;
+  --art-floor: #202020;
+  --art-wall: #161616;
+  --art-accent: #ac8452;
 }
 
 *,

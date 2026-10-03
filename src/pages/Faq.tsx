@@ -1,64 +1,14 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import RandomImageBackground from '../components/RandomImageBackground';
-import './Faq.css';
+import { Link } from 'react-router-dom';
+import LearningReveal from '../components/LearningReveal';
 
-const FAQS = [
-  {
-    question: "How do I create notes?",
-    answer: "Click the open notes button and start typing. vCHITR saves your work automatically as you write. Organize by subject for easy retrieval later."
-  },
-  {
-    question: "Can I access notes offline?",
-    answer: "Your notes sync across devices when connected. Check your settings for offline access options. vCHITR keeps your data secure and available."
-  },
-  {
-    question: "How do I organize subjects?",
-    answer: "Create folders for each subject you study. Tag notes with relevant keywords for quick searching. The system learns your preferences over time."
-  },
-  {
-    question: "Is my data private?",
-    answer: "Your notes are encrypted and stored securely. Only you can access your personal information. vCHITR never shares data with third parties."
-  },
-  {
-    question: "What devices are supported?",
-    answer: "vCHITR works on desktop, tablet, and mobile devices. Your notes sync instantly across all platforms. Start on one device and continue on another."
-  }
+const questions = [
+  ['What can I study?', 'Start with the complete NCERT Class 10 maths course: 14 chapters, worked examples, chapter tests and focused practice. Other education levels are coming soon.'],
+  ['How is my learning level chosen?', 'Your education level is saved per subject. Explanation depth and practice difficulty adjust using recent chapter answers and your learning profile when enough evidence is available. Change your education level in Profile.'],
+  ['When does the final test unlock?', 'Submit a test for every chapter. No minimum score is required. Focused practice does not count toward this requirement.'],
+  ['Can I retake a test?', 'Yes. Your last score, best score and attempt history stay in your account. New chapter sets can adjust to your learning tier. Reset test results from the course overview.'],
+  ['Where do my notes go?', 'Save a completed tutor answer to Notes. Your saved explanations are available when signed in, with course and chapter filters. An internet connection is required.'],
+  ['What if the AI tutor is unavailable?', 'Study material and tests remain available. AI answers can contain mistakes: compare worked solutions with the NCERT textbook and flag an answer when it needs review.'],
 ];
-
-const Faq: React.FC = () => {
-  const navigate = useNavigate();
-
-  return (
-    <RandomImageBackground
-      containerClassName="faq-container"
-      overlayClassName="faq-overlay"
-    >
-      <div className="faq-card">
-        <div className="faq-header">
-          <h1 className="faq-title">FAQ</h1>
-          <p className="faq-subtitle">Find answers to common questions about using vCHITR and managing your notes.</p>
-        </div>
-
-        <div className="faq-content">
-          {FAQS.map((faq, index) => (
-            <div key={index} className="faq-item">
-              <h3 className="faq-question">{faq.question}</h3>
-              <p className="faq-answer">{faq.answer}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="faq-footer">
-          <h2>Need more help?</h2>
-          <p>Reach out to our support team anytime</p>
-          <button className="btn btn-outline-dark" onClick={() => navigate('/contact')}>
-            Contact
-          </button>
-        </div>
-      </div>
-    </RandomImageBackground>
-  );
-};
-
-export default Faq;
+export default function Faq() {
+  return <main className="info-page"><LearningReveal><p className="course-eyebrow">About your study space</p><h1>A few useful answers.</h1><div className="info-columns"><aside><p>Learn at your pace. Keep your progress. Come back to what matters.</p><Link className="course-button" to="/subjects/learning">Open learning ↗</Link></aside><section className="faq-list" aria-label="Frequently asked questions">{questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</section></div></LearningReveal></main>;
+}

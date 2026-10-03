@@ -24,10 +24,7 @@ const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia
-      ? window.matchMedia('(prefers-color-scheme: dark)').matches
-      : false;
-    return saved === 'dark' || (!saved && prefersDark);
+    return saved !== 'light';
   });
   const [isOpen, setIsOpen] = useState(false);
   // Set default starting pos to match visual layout next to "vCHITR" brand (~120px)
@@ -196,6 +193,8 @@ const Navigation: React.FC = () => {
         style={{ left: `${posX}px`, touchAction: 'none' }}
         aria-label="Open Navigation"
         aria-expanded={isOpen}
+        aria-controls="main-navigation"
+        inert={isOpen}
       >
         <span className="navbar-trigger-bars" aria-hidden="true">
           <span></span>
@@ -231,7 +230,7 @@ const Navigation: React.FC = () => {
         </div>
       )}
 
-      <nav className="navbar" ref={navRef}>
+      <nav id="main-navigation" className="navbar" ref={navRef} aria-hidden={!isOpen} inert={!isOpen}>
         <button
           className="navbar-close-btn"
           onClick={toggleNav}

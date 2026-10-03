@@ -35,7 +35,7 @@ export default function ChapterTutor({ courseId, chapterId }: { courseId: string
     finally { setBusy(false); }
   }
   return <section className="course-panel chapter-tutor" aria-labelledby="chapter-tutor-title">
-    <h2 id="chapter-tutor-title">Ask about this chapter</h2><p className="course-muted">Answers use this chapter’s material and your explanation depth. Check worked solutions against the textbook.</p>
+    <h2 id="chapter-tutor-title">Ask your tutor</h2><p className="course-muted">Chapter-focused help. Check AI answers against the textbook.</p>
     {!data ? <p role="status">{loadError ?? 'Loading conversation…'} <button className="course-text-button" onClick={reload}>Retry</button></p>
       : <>
         {!data.enabled && <p role="status">Tutor generation is temporarily unavailable. Existing answers and Notes remain accessible.</p>}
@@ -50,7 +50,7 @@ export default function ChapterTutor({ courseId, chapterId }: { courseId: string
         </article>)}</div>
         <form onSubmit={event => { event.preventDefault(); void ask(); }}>
           <label htmlFor="chapter-question">Your question</label>
-          <textarea id="chapter-question" className="tutor-input" value={question} maxLength={2000} rows={3} disabled={busy || !data.enabled} onChange={event => setQuestion(event.target.value)} />
+          <textarea id="chapter-question" className="tutor-input" placeholder="Which step would you like to understand?" value={question} maxLength={2000} rows={3} disabled={busy || !data.enabled} onChange={event => setQuestion(event.target.value)} />
           <div className="course-actions"><button className="course-button primary" disabled={busy || !data.enabled || !question.trim()}>{busy ? 'Working…' : 'Ask tutor'}</button>
             <button className="course-button" type="button" disabled={busy} onClick={reload}>Refresh conversation</button><Link to="/notes">Open Notes ↗</Link></div>
         </form>

@@ -1,48 +1,12 @@
-import React from 'react';
-import RandomImageBackground from '../components/RandomImageBackground';
-import './Contact.css';
+import type { FormEvent } from 'react';
+import LearningReveal from '../components/LearningReveal';
 
-const Contact: React.FC = () => {
-  return (
-    <RandomImageBackground
-      containerClassName="contact-container"
-      overlayClassName="contact-overlay"
-    >
-      <div className="contact-card">
-        <div className="contact-content">
-          <p className="contact-preheading">Connect</p>
-          <h1 className="contact-title">Get in touch</h1>
-          <p className="contact-email">Help@vCHITR.com</p>
-
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
-            <div className="form-group">
-              <label htmlFor="name">Name</label>
-              <input type="text" id="name" name="name" placeholder="Your name" />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input type="email" id="email" name="email" placeholder="Your email address" />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="message">Message</label>
-              <textarea id="message" name="message" rows={6} placeholder="Your message"></textarea>
-            </div>
-
-            <div className="form-checkbox">
-              <input type="checkbox" id="privacy" name="privacy" />
-              <label htmlFor="privacy">I agree to the privacy policy</label>
-            </div>
-
-            <button type="submit" className="btn btn-dark">
-              Send
-            </button>
-          </form>
-        </div>
-      </div>
-    </RandomImageBackground>
-  );
-};
-
-export default Contact;
+export default function Contact() {
+  function compose(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const body = `${data.get('message')}\n\nFrom: ${data.get('name')}\nReply to: ${data.get('email')}`;
+    window.location.href = 'mailto:Help@vCHITR.com?subject=' + encodeURIComponent('vCHITR enquiry') + '&body=' + encodeURIComponent(body);
+  }
+  return <main className="info-page"><LearningReveal><p className="course-eyebrow">Contact</p><h1>Let’s make learning better.</h1><div className="info-columns"><aside><p>Questions, feedback or a concept that needs a clearer explanation.</p><a href="mailto:Help@vCHITR.com">Help@vCHITR.com ↗</a></aside><form className="contact-message" onSubmit={compose}><label htmlFor="contact-name">Name</label><input id="contact-name" name="name" autoComplete="name" required maxLength={100} /><label htmlFor="contact-email">Email</label><input id="contact-email" name="email" type="email" autoComplete="email" required /><label htmlFor="contact-message">Message</label><textarea id="contact-message" name="message" rows={5} required maxLength={3000} /><button className="course-button primary">Compose email ↗</button><p className="course-muted">Opens your email app.</p></form></div></LearningReveal></main>;
+}

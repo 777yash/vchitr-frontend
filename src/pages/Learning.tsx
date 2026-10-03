@@ -12,6 +12,7 @@ import ChapterTutor from '../components/ChapterTutor';
 import { useActiveTime } from '../learning/useActiveTime';
 import LearningReveal from '../components/LearningReveal';
 import LearningSkeleton from '../components/LearningSkeleton';
+import AutomaticExplanation from '../components/AutomaticExplanation';
 
 const percentFormat = new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 0 });
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -48,8 +49,8 @@ function SubjectCourse({ subjectName }: { subjectName: string }) {
     <Link to="/subjects/learning">← All subjects</Link>
     {!subject ? <LoadingState error={error} retry={reload} /> : <LearningReveal>
       <p className="course-eyebrow">Learning / {subject.subjectName}</p>
-      <h1>Where would you like to begin?</h1>
-      <p className="course-lead">Choose once. Your level is saved to your account for this subject. Change it later in Profile.</p>
+      <h1>Choose your level.</h1>
+      <p className="course-lead">Saved for this subject. Change it in Profile.</p>
       {saveError && <p className="course-alert" role="alert">{saveError}</p>}
       <div className="level-grid">{subject.levels.map((level) => <div className={'level-card ' + (level.available ? 'available' : '')} key={level.id}>
         <span className="course-eyebrow">{level.available ? 'Ready to study' : 'Coming soon'}</span>
@@ -103,20 +104,20 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
   }
   const chapterNavigation = <>
       <Link className="course-back-link" to="/subjects/learning">← All subjects</Link>
-      <p className="course-eyebrow">Your saved course</p>
+      <p className="course-eyebrow">Course</p>
       <Link className="course-overview-link" to={courseHref()}>{course.title}</Link>
       <p>{completed} / {course.chapters.length} chapter tests submitted</p>
-      {course.aptitude && <><p>Learning tier: <strong>{course.aptitude.tier}</strong></p><progress value={course.aptitude.progress} max={100} aria-label="Progress toward next learning tier" /><p>{course.aptitude.reason === 'more-evidence-needed' ? 'Default while gathering enough reliable evidence.' : course.aptitude.progress + '% toward ' + (course.aptitude.tier === 'advanced' ? 'mastery' : 'next tier')}</p></>}
+      {course.aptitude && <><p>Learning tier: <strong>{course.aptitude.tier}</strong></p><progress value={course.aptitude.progress} max={100} aria-label="Progress toward next learning tier" /><p>{course.aptitude.reason === 'more-evidence-needed' ? 'Gathering learning evidence.' : course.aptitude.progress + '% toward ' + (course.aptitude.tier === 'advanced' ? 'mastery' : 'next tier')}</p></>}
       <progress value={completed} max={course.chapters.length} aria-label="Chapter tests submitted" />
       <nav>{course.chapters.map((chapter, i) => {
         const scores = testScores(course.progress.history, chapter.id);
         return <Link className={'course-chapter-link ' + (chapterId === chapter.id ? 'active' : '')} key={chapter.id} aria-current={chapterId === chapter.id ? 'page' : undefined} to={courseHref(chapter.id)}>
-          <span className="course-chapter-number">{String(i + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{scores.latest ? '✓ Latest ' + percent(scores.latest.percent) + ' · Best ' + percent(scores.best ?? 0) : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Not started'}</small></span>
+          <span className="course-chapter-number">{String(i + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{scores.latest ? '✓ Latest ' + percent(scores.latest.percent) + ' · Best ' + percent(scores.best ?? 0) : course.progress.read.includes(chapter.id) ? 'Read · test pending' : chapter.readingState === 'in-progress' ? 'Reading in progress' : 'Not started'}</small></span>
         </Link>;
       })}</nav>
       <Link className="course-button" to={courseHref('final', 'test')}>Final test {course.progress.finalUnlocked ? '→' : '· Locked'}</Link>
       <Link className="course-profile-link" to="/profile">Change level in Profile ↗</Link>
-      <Link className="course-profile-link" to="/notes">Notes vault ↗</Link>
+      <Link className="course-profile-link" to="/notes">Notes ↗</Link>
   </>;
   return <div className="course-layout learning-surface">
     <a className="course-button course-skip-link" href="#course-main">Skip to lesson</a>
@@ -132,12 +133,12 @@ function CourseWorkspace({ course, reload }: { course: Course; reload: () => voi
         : testing ? <TestLoader key={chapterId} course={course} testId={chapterId} reloadCourse={reload} backTo={courseHref(chapterId === 'final' ? undefined : chapterId)} />
         : <LessonLoader key={chapterId} course={course} chapterId={chapterId} reloadCourse={reload} />
         : <>
-          <p className="course-eyebrow">Your learning path</p><h1>A little progress, every chapter.</h1>
-          <p className="course-lead">{course.chapters.length} short lessons. Worked examples. A practice test for every chapter.</p>
-          {course.aptitude && <section className="course-panel"><h2>Your learning tier: {course.aptitude.tier}</h2><p>{course.aptitude.reason === 'more-evidence-needed' ? 'More reliable evidence is needed before adjusting your tier.' : 'Tier reflects test performance, consistency, reading engagement and tutor feedback.'}</p><p className="course-muted">{course.aptitude.evidenceCount} evidence points · Confidence {percent(course.aptitude.confidence * 100)}. Education level stays unchanged. Tiers are recalculated after assessments and nightly; they are practice guidance, not a diagnosis of ability.</p><details><summary>How this score is calculated</summary><ul>{Object.entries(course.aptitude.signals).map(([signal, value]) => <li key={signal}>{signal.replace(/([A-Z])/g, ' $1')}: {percent(value * 100)}</li>)}</ul></details></section>}
+          <p className="course-eyebrow">Your learning path</p><h1>{course.title}</h1>
+          <p className="course-lead">{course.chapters.length} chapters. One step at a time.</p>
+          {course.aptitude && <details className="course-panel course-profile-detail"><summary>Learning profile · {course.aptitude.tier}</summary><p className="course-muted">{course.aptitude.evidenceCount} evidence points · Confidence {percent(course.aptitude.confidence * 100)}. More answers help us adapt your learning.</p><ul>{Object.entries(course.aptitude.signals).map(([signal, value]) => <li key={signal}>{signal.replace(/([A-Z])/g, ' $1')}: {percent(value * 100)}</li>)}</ul><p className="course-muted">Practice guidance, not a complete measure of ability. Education level stays unchanged.</p></details>}
           <div className="course-summary"><div><strong>{course.progress.read.length}</strong><span>lessons marked read</span></div><div><strong>{completed} / {course.chapters.length}</strong><span>chapter tests submitted</span></div><div><strong>{final.latest ? percent(final.latest.percent) : course.progress.finalUnlocked ? 'Unlocked' : 'Locked'}</strong><span>{final.latest ? 'final test · latest score' : 'final test'}</span></div></div>
-          <section className="course-panel course-continue"><p className="course-eyebrow">Your next chapter</p><h2>{nextChapter?.title ?? 'Keep your knowledge fresh'}</h2><p>Read at your own pace. Work through an example, then put it into practice.</p><Link className="course-button primary" to={courseHref((nextChapter ?? course.chapters[0]).id)}>Continue learning →</Link><span className="course-orbit" aria-hidden="true">∑</span></section>
-          <section className="course-panel"><h2>Your chapters</h2><p className="course-muted">Learn → practise → review. Submit all {course.chapters.length} chapter tests to unlock the final. No minimum score required.</p><div className="course-chapter-list">{course.chapters.map((chapter, index) => <Link className="course-chapter-row" key={chapter.id} to={courseHref(chapter.id)}><span className="course-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{testScores(course.progress.history, chapter.id).latest ? '✓ Test submitted' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : 'Ready to explore'}</small></span><span aria-hidden="true">↗</span></Link>)}</div><p className="course-muted">Original NCERT-aligned starter notes. Each lesson links to the textbook for full treatment and exercises.</p></section>
+          <section className="course-panel course-continue"><p className="course-eyebrow">Your next chapter</p><h2>{nextChapter?.title ?? 'Keep your knowledge fresh'}</h2><Link className="course-button primary" to={courseHref((nextChapter ?? course.chapters[0]).id)}>Continue learning →</Link><span className="course-orbit" aria-hidden="true">∑</span></section>
+          <section className="course-panel"><h2>Your chapters</h2><p className="course-muted">Submit all chapter tests to unlock the final.</p><div className="course-chapter-list">{course.chapters.map((chapter, index) => <Link className="course-chapter-row" key={chapter.id} to={courseHref(chapter.id)}><span className="course-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{chapter.title}<small>{testScores(course.progress.history, chapter.id).latest ? '✓ Test submitted' : course.progress.read.includes(chapter.id) ? 'Read · test pending' : chapter.readingState === 'in-progress' ? 'Reading in progress' : 'Not started'}</small></span><span aria-hidden="true">↗</span></Link>)}</div></section>
           <section className="course-panel"><h2>Final course test</h2><p>{final.latest ? 'Final submitted. Latest ' + percent(final.latest.percent) + ' · Best ' + percent(final.best ?? 0) + '.' : course.progress.finalUnlocked ? 'All chapter tests submitted. Your final is ready.' : (course.chapters.length - completed) + ' chapter tests remain.'}</p><Link className="course-button" to={courseHref('final', 'test')}>{final.latest ? 'Review final test' : course.progress.finalUnlocked ? 'Open final test' : 'View remaining chapters'}</Link></section>
           <details className="course-panel course-management"><summary>Manage course results</summary><h2>Reset test results</h2><p>Clear this course’s saved test drafts, attempts and scores. The final test will lock again. Your study level and read lessons are kept.</p>
             {!resetConfirm ? <button className="course-button" ref={resetTrigger} onClick={() => toggleReset(true)}>Reset results…</button>
@@ -166,15 +167,16 @@ function LessonLoader({ course, chapterId, reloadCourse }: { course: Course; cha
     <p className="course-eyebrow">{course.title} · Chapter {Number(chapterId.slice(3))}</p><h1>{lesson.title}</h1><p className="course-lead">{lesson.goal}</p>
     <a className="course-source" href={'https://ncert.nic.in/textbook/pdf/jemh1' + chapterId.slice(3) + '.pdf'} target="_blank" rel="noreferrer">Read the NCERT chapter ↗</a>
     {lesson.contentVariant && <div className="course-panel course-depth">
-      <h2>Explanation depth: {lesson.contentVariant.servedTier === 'beginner' ? 'Beginner · more guidance' : lesson.contentVariant.servedTier === 'advanced' ? 'Advanced · deeper exploration' : 'Default · original lesson'}</h2>
-      <p className="course-muted">{lesson.contentVariant.selection.reason === 'more-evidence-needed'
-        ? 'Starting with the original lesson while we collect more answers across this chapter’s concepts.'
-        : lesson.contentVariant.selection.reason === 'five-signals' ? 'Selected from your course aptitude profile: assessments, study consistency, reading engagement and tutor feedback.' : 'Selected from your recent first answers to distinct chapter questions. Repeating questions does not add evidence.'} Your saved education level stays unchanged.</p>
+      <h2>{lesson.contentVariant.servedTier === 'beginner' ? 'Beginner · guided explanation' : lesson.contentVariant.servedTier === 'advanced' ? 'Advanced · deeper explanation' : 'Standard explanation'}</h2>
+      <p className="course-muted">{lesson.contentVariant.status === 'unavailable' ? 'Original lesson while an adapted explanation is prepared.' : lesson.contentVariant.selection.reason === 'more-evidence-needed'
+        ? 'More chapter answers help us adapt your lessons.'
+        : lesson.contentVariant.selection.reason === 'five-signals' ? 'Adapted to your learning profile.' : 'Adapted to your recent chapter answers.'}</p>
     </div>}
+    <AutomaticExplanation courseId={course.id} lesson={lesson} reload={reload} />
     <ReadingLesson lesson={lesson} courseId={course.id} testTo={courseHref(chapterId, 'test')} />
     {saveError && <p role="alert" className="course-alert">{saveError}</p>}
     <div className="course-actions"><button className="course-button" disabled={read || busy} onClick={markRead}>{read ? '✓ Marked as read' : busy ? 'Saving…' : 'Mark as read'}</button><Link className="course-button primary" to={courseHref(chapterId, 'test')}>Open chapter practice →</Link></div>
-    <p className="course-muted">{lesson.questionCount} fixed questions · no time limit · explanations after submission.</p>
+    <p className="course-muted">{lesson.questionCount} questions · no time limit · review after submission.</p>
     {lesson.adaptiveAvailable && <Link className="course-button" to={courseHref(chapterId, 'practice')}>Review concepts &amp; focused practice →</Link>}
     {course.engagementEnabled && <ChapterTutor key={chapterId} courseId={course.id} chapterId={chapterId} />}
   </article></LearningReveal>;
@@ -258,6 +260,7 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload, engagementEn
     <p>{attempt?.questions.length ?? initial.questionCount} {adaptive && !attempt ? 'questions requested' : 'questions'} · 1 point each · no negative marking · no time limit</p>
     {scores.latest && !adaptive && <p>Latest {percent(scores.latest.percent)} · Best {percent(scores.best ?? 0)}</p>}
     {adaptive && <p>Focused practice does not count as a chapter test or unlock the final. Difficulty stays within your saved education level.</p>}
+    {!adaptive && attempt?.selection?.tier && <p className="course-muted">{attempt.selection.tier} difficulty · {attempt.selection.freshCount} fresh questions</p>}
     {adaptive && attempt?.selection && <div className="course-panel"><p>Focus: {attempt.selection.focusConcepts.join(', ')}</p><p>{Object.entries(attempt.selection.difficultyMix).map(([level, count]) => `${count} ${level}`).join(' · ')}</p><p>{attempt.selection.mode === 'revision' ? 'Revision set: these questions have been seen before and will not add fresh evidence.' : `${attempt.selection.freshCount} fresh questions. Previously seen questions are excluded.`}</p>{attempt.questions.length < 5 && <p>Shorter set: {attempt.questions.length} suitable questions available for this set.</p>}</div>}
     {!answering && errorAlert}
     {saved && <p className="course-save-status" role="status">✓ {saved}</p>}
@@ -266,8 +269,8 @@ function TestView({ initial, courseId, onSubmitted, backTo, reload, engagementEn
     {!attempt ? <button className="course-button primary" disabled={busy} onClick={start}>{pending === 'start' ? 'Starting…' : adaptive ? 'Start focused practice' : 'Start test'}</button>
       : attempt.submittedAt ? <>
         <div className="course-result" role="status"><strong>{attempt.correct} / {attempt.total} · {percent(attempt.percent ?? 0)}</strong><h2>{(attempt.percent ?? 0) >= 80 ? 'A strong start' : 'Keep building your understanding'}</h2><p>{adaptive ? 'Use the concept feedback to choose what to revise next.' : recommendation(attempt.percent ?? 0)}</p><p>This short test is a practice signal, not a complete measure of mastery.</p></div>
-        <button className="course-button primary" disabled={busy} onClick={start}>{pending === 'start' ? 'Starting…' : adaptive ? 'Continue focused practice' : 'Retry same questions'}</button>
-        <p className="course-muted">{adaptive ? 'The next set adapts to fresh evidence. Sets at different difficulties are not directly comparable.' : 'Retakes use the same fixed questions.'} All attempts are kept until you reset course results.</p>
+        <button className="course-button primary" disabled={busy} onClick={start}>{pending === 'start' ? 'Starting…' : adaptive ? 'Continue focused practice' : 'Retake test'}</button>
+        <p className="course-muted">{adaptive || attempt.selection?.tier ? 'New sets adapt to your evidence. Scores across difficulties are not directly comparable.' : 'Retakes use the same fixed questions.'} Attempt history is saved.</p>
         {initial.adaptiveAvailable && <Link className="course-button" to={courseHref(initial.testId, 'practice')}>Review weak concepts &amp; practise →</Link>}
         {attempt.questions.map((q, i) => <article className="course-panel" key={q.id}><p className="course-eyebrow">{q.concept} · {attempt.answers[q.id] === q.answer ? 'Correct' : 'Review this concept'}</p><h2>{i + 1}. {q.prompt}</h2><p>Your answer: {attempt.answers[q.id] === undefined ? 'Not answered' : q.options[attempt.answers[q.id]]}</p>{q.answer !== undefined && <p><strong>Correct answer: {q.options[q.answer]}</strong></p>}<p>{q.explanation}</p></article>)}
       </> : <form onSubmit={(e) => { e.preventDefault(); void save(true); }}>

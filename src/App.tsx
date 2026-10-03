@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Navigation from './components/Navigation'
 import Home from './pages/Home'
-import Subjects from './pages/Subjects'
 import Faq from './pages/Faq'
 import Contact from './pages/Contact'
 import Notes from './pages/SavedNotes'
@@ -12,6 +11,7 @@ import Profile from './pages/Profile'
 import SubjectSelection from './pages/SubjectSelection'
 import Learning from './pages/Learning'
 import RequireAuth from './components/RequireAuth'
+import './design.css'
 function App() {
   return (
     <div className="app">
@@ -23,7 +23,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route element={<RequireAuth />}>
-          <Route path="/subjects" element={<Subjects />} />
+          <Route path="/subjects" element={<Navigate to="/subjects/learning" replace />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/notes/:subjectName" element={<Notes />} />
           <Route path="/onboarding" element={<Onboarding />} />
